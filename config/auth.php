@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Administrateur;
 
 return [
 
@@ -42,6 +43,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'administrateurs',
+        ],
     ],
 
     /*
@@ -67,10 +72,10 @@ return [
             'model' => env('AUTH_MODEL', User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'administrateurs' => [
+            'driver' => 'eloquent',
+            'model' => Administrateur::class,
+        ],
     ],
 
     /*
