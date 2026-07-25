@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\ArticleBlog;
+use App\Models\Produit;
 use App\Models\Tag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -55,7 +56,7 @@ class BlogController extends Controller
 
     /**
      * GET /api/blog/{slug}
-     * Lecture d'un article avec incrémentation du nombre de vues et produits associés.
+     * Lecture d'un article avec incrémentation des vues et produits recommandés.
      */
     public function show(string $slug): JsonResponse
     {
@@ -70,8 +71,19 @@ class BlogController extends Controller
             }])
             ->firstOrFail();
 
-        // Incrémentation des vues
+        // Incrémentation des vues en base de données
         $article->increment('vues');
+        $article->refresh();
+
+        // Produits associés / recommandés d'après les tags de l'admin
+        $produitsRecommandes = $article->produits;
+        if ($produitsRecommandes->isEmpty()) {
+            $produitsRecommandes = Produit::where('statut', 'actif')
+                ->with('imagePrincipale')
+                ->inRandomOrder()
+                ->limit(4)
+                ->get();
+        }
 
         // Articles récents suggérés
         $articlesSuggest = ArticleBlog::where('statut', 'publie')
@@ -79,12 +91,13 @@ class BlogController extends Controller
             ->where('date_publication', '<=', now())
             ->orderBy('date_publication', 'desc')
             ->limit(3)
-            ->get(['id', 'titre', 'slug', 'image_principale', 'date_publication']);
+            ->get(['id', 'titre', 'slug', 'image_principale', 'date_publication', 'extrait', 'vues']);
 
         return response()->json([
             'status' => 'success',
             'data' => [
                 'article' => $article,
+                'produits_recommandes' => $produitsRecommandes,
                 'articles_suggeres' => $articlesSuggest,
             ],
         ]);

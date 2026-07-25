@@ -290,27 +290,64 @@ class DatabaseSeeder extends Seeder
         ProduitImage::updateOrCreate(['id' => 8], ['produit_id' => 8, 'nom_fichier' => 'machette.jpg', 'url_image' => 'storage/produits/machette.jpg', 'alt_text' => 'Image Machette 22 pouces', 'ordre_affichage' => 0, 'principale' => true]);
 
         // 5. Seed Tags & Articles de Blog
-        $tag1 = Tag::updateOrCreate(['slug' => 'conseils-agricoles'], ['nom' => 'Conseils Agricoles', 'couleur' => '#10B981']);
-        $tag2 = Tag::updateOrCreate(['slug' => 'fertilisation'], ['nom' => 'Fertilisation', 'couleur' => '#3B82F6']);
+        $tag1 = Tag::updateOrCreate(['slug' => 'conseils-agronomiques'], ['nom' => 'Conseils Agronomiques', 'couleur' => '#10B981']);
+        $tag2 = Tag::updateOrCreate(['slug' => 'fertilisation'], ['nom' => 'Fertilisation & Engrais', 'couleur' => '#3B82F6']);
+        $tag3 = Tag::updateOrCreate(['slug' => 'protection-cultures'], ['nom' => 'Protection des Cultures', 'couleur' => '#EF4444']);
+        $tag4 = Tag::updateOrCreate(['slug' => 'irrigation-materiel'], ['nom' => 'Irrigation & Équipements', 'couleur' => '#8B5CF6']);
 
-        $article = ArticleBlog::updateOrCreate(
-            ['slug' => 'guide-complet-utilisation-uree-yara'],
+        $articlesData = [
             [
-                'titre' => 'Guide complet sur l\'utilisation de l\'Urée YARA',
-                'contenu' => 'L\'urée YARA est un engrais hautement concentré en azote (46%). Découvrez comment l\'appliquer efficacement sur vos parcelles pour maximiser vos rendements tout en évitant les pertes par volatilisation.',
-                'extrait' => 'Conseils pratiques et dosages recommandés pour l\'application de l\'urée sur vos cultures.',
-                'statut' => 'publie',
-                'auteur_id' => $admin1->id,
-                'image_principale' => 'storage/blog/guide_uree.jpg',
-                'meta_title' => 'Guide d\'utilisation de l\'Urée YARA - Agroshop',
-                'meta_description' => 'Tout savoir sur le dosage et l\'application de l\'urée YARA.',
-                'date_publication' => now(),
-                'vues' => 12,
+                'slug' => 'guide-complet-utilisation-uree-yara',
+                'titre' => 'Guide complet : Maximiser le rendement du Maïs avec l\'Urée YARA 46%',
+                'extrait' => 'Découvrez le calendrier d\'épandage et les meilleurs dosages par hectare pour éviter les pertes d\'azote.',
+                'contenu' => 'L\'urée YARA 46% N est l\'engrais le plus concentré en azote. Pour maximiser son absorption par le maïs, il est recommandé de fractionner l\'application : un tiers au semis et deux tiers 30 jours après la levée.',
+                'image_principale' => 'images/champ-agricole-bg.jpg',
+                'tag_ids' => [$tag1->id, $tag2->id]
+            ],
+            [
+                'slug' => 'lutter-efficacement-contre-chenille-legionnaire-togo',
+                'titre' => 'Comment protéger vos parcelles contre la Chenille Légionnaire',
+                'extrait' => 'Protégez vos cultures de céréales grâce aux traitements insecticides homologués et aux bonnes pratiques de surveillance.',
+                'contenu' => 'La chenille légionnaire (Spodoptera frugiperda) peut détruire jusqu\'à 70% des récoltes. L\'utilisation préventive de l\'insecticide Katana 50 EC combinée à l\'inspection régulière des cornets de maïs garantit une protection optimale.',
+                'image_principale' => 'images/produits-agroshop-npk-spray-irrigation-mais.png',
+                'tag_ids' => [$tag3->id]
+            ],
+            [
+                'slug' => 'avantages-irrigation-goutte-a-goutte-maraichage',
+                'titre' => 'Irrigation Goutte-à-Goutte : Économisez 50% d\'eau tout en doublant vos récoltes',
+                'extrait' => 'Le guide pratique pour installer un kit d\'irrigation abordable sur une parcelle de maraîchage au Togo.',
+                'contenu' => 'L\'irrigation goutte-à-goutte apporte l\'eau et les nutriments directement au niveau des racines. Elle évite l\'évaporation, réduit les mauvaises herbes et garantit une récolte constante toute l\'année.',
+                'image_principale' => 'images/Agroshop-hero2.png',
+                'tag_ids' => [$tag4->id]
+            ],
+            [
+                'slug' => 'choix-outils-quincaillerie-chantier-agricole',
+                'titre' => 'Outillage & Quincaillerie : Choisir son matériel de chantier longue durée',
+                'extrait' => 'Brouettes renforcées, pulvérisateurs et tuyaux : comparatif pour s\'équiper efficacement.',
+                'contenu' => 'Pour des travaux agricoles et de construction durables, le choix de la qualité est essentiel. Les brouettes 90L à cuve renforcée et les pulvérisateurs à dos STIHL garantissent longévité et sécurité sur le terrain.',
+                'image_principale' => 'images/Agroshop-hero3.png',
+                'tag_ids' => [$tag4->id]
             ]
-        );
+        ];
 
-        $article->tags()->syncWithoutDetaching([$tag1->id, $tag2->id]);
-        $article->produits()->syncWithoutDetaching([$produit1->id]);
+        foreach ($articlesData as $artData) {
+            $article = ArticleBlog::updateOrCreate(
+                ['slug' => $artData['slug']],
+                [
+                    'titre' => $artData['titre'],
+                    'contenu' => $artData['contenu'],
+                    'extrait' => $artData['extrait'],
+                    'statut' => 'publie',
+                    'auteur_id' => $admin1->id,
+                    'image_principale' => $artData['image_principale'],
+                    'meta_title' => $artData['titre'] . ' - AgroShop',
+                    'meta_description' => $artData['extrait'],
+                    'date_publication' => now(),
+                    'vues' => rand(15, 120),
+                ]
+            );
+            $article->tags()->syncWithoutDetaching($artData['tag_ids']);
+        }
 
         // 6. Seed Documents Fiches Techniques & Guides
         ProduitDocument::updateOrCreate(
