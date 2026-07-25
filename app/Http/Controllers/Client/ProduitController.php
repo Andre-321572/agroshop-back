@@ -29,11 +29,15 @@ class ProduitController extends Controller
             });
         }
 
-        // Filtre par slug de catégorie
+        // Filtre par slug ou ID de catégorie (inclut les sous-catégories)
         if ($categorySlug = $request->input('category')) {
             $query->whereHas('categories', function ($q) use ($categorySlug) {
                 $q->where('categories.slug', $categorySlug)
-                  ->orWhere('categories.id', $categorySlug);
+                  ->orWhere('categories.id', $categorySlug)
+                  ->orWhereHas('parent', function ($parentQuery) use ($categorySlug) {
+                      $parentQuery->where('categories.slug', $categorySlug)
+                                  ->orWhere('categories.id', $categorySlug);
+                  });
             });
         }
 
