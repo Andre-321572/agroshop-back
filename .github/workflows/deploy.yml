@@ -26,7 +26,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ./agrooshop.tg.digitalforges.org/
+          server-dir: ./Agrooshop-app/
           # Retour au mode complet car pas de SSH disponible
           exclude: |
             **/.git*
