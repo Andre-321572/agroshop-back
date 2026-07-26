@@ -20,7 +20,7 @@ class ProduitController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Produit::with(['categories', 'imagePrincipale'])
+        $query = Produit::with(['categories', 'imagePrincipale', 'images'])
             ->where('statut', '!=', 'inactif');
 
         // Recherche textuelle
@@ -45,7 +45,7 @@ class ProduitController extends Controller
             $query->where('statut', $status);
         }
 
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 100);
         $produits = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
         return response()->json([
@@ -94,6 +94,8 @@ class ProduitController extends Controller
             'meta_title' => 'nullable|string|max:200',
             'meta_description' => 'nullable|string',
             'slug' => 'nullable|string|max:200',
+            'url_image' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
             'categories' => 'nullable|array',
             'categories.*' => 'integer|exists:categories,id',
             'categorie_principale' => 'nullable|integer|exists:categories,id',
@@ -112,9 +114,28 @@ class ProduitController extends Controller
                 $slug = $slug . '-' . time();
             }
 
+            $mainUrl = $request->input('url_image', 'storage/produits/default.jpg');
+
+            // Upload direct de l'image principale si fichier envoyé
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $newFileName = uniqid('main_') . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('produits', $newFileName, 'public');
+                $mainUrl = 'storage/produits/' . $newFileName;
+            } elseif ($request->hasFile('image_principale')) {
+                $file = $request->file('image_principale');
+                $newFileName = uniqid('main_') . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('produits', $newFileName, 'public');
+                $mainUrl = 'storage/produits/' . $newFileName;
+            }
+
             $produit = Produit::create(array_merge(
-                $request->except(['categories', 'categorie_principale', 'images', 'slug']),
-                ['slug' => $slug, 'featured' => $request->boolean('featured')]
+                $request->except(['categories', 'categorie_principale', 'images', 'image', 'image_principale', 'slug']),
+                [
+                    'slug' => $slug, 
+                    'featured' => $request->boolean('featured'),
+                    'url_image' => $mainUrl
+                ]
             ));
 
             // Association des catégories
@@ -127,23 +148,33 @@ class ProduitController extends Controller
                 }
             }
 
-            // Upload des images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $fileName = $image->getClientOriginalName();
-                $newFileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
-                $image->storeAs('produits', $newFileName, 'public');
+            // Sync main ProduitImage relation
+            ProduitImage::create([
+                'produit_id' => $produit->id,
+                'nom_fichier' => basename($mainUrl),
+                'url_image' => $mainUrl,
+                'alt_text' => 'Image principale de ' . $produit->nom_commercial,
+                'ordre_affichage' => 0,
+                'principale' => true,
+            ]);
 
-                ProduitImage::create([
-                    'produit_id' => $produit->id,
-                    'nom_fichier' => $fileName,
-                    'url_image' => 'storage/produits/' . $newFileName,
-                    'alt_text' => 'Image de ' . $produit->nom_commercial,
-                    'ordre_affichage' => $index,
-                    'principale' => ($index === 0) ? true : false,
-                ]);
+            // Upload des images galerie
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $index => $image) {
+                    $fileName = $image->getClientOriginalName();
+                    $newFileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
+                    $image->storeAs('produits', $newFileName, 'public');
+
+                    ProduitImage::create([
+                        'produit_id' => $produit->id,
+                        'nom_fichier' => $fileName,
+                        'url_image' => 'storage/produits/' . $newFileName,
+                        'alt_text' => 'Image de ' . $produit->nom_commercial,
+                        'ordre_affichage' => $index + 1,
+                        'principale' => false,
+                    ]);
+                }
             }
-        }
 
             DB::commit();
 
@@ -189,6 +220,8 @@ class ProduitController extends Controller
             'featured' => 'nullable|boolean',
             'meta_title' => 'nullable|string|max:200',
             'meta_description' => 'nullable|string',
+            'url_image' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
             'categories' => 'nullable|array',
             'categories.*' => 'integer|exists:categories,id',
             'categorie_principale' => 'nullable|integer|exists:categories,id',
@@ -199,7 +232,7 @@ class ProduitController extends Controller
         DB::beginTransaction();
 
         try {
-            $data = $request->except(['categories', 'categorie_principale', 'images']);
+            $data = $request->except(['categories', 'categorie_principale', 'images', 'image', 'image_principale']);
 
             // Mise à jour du slug si le nom change
             if ($request->has('nom_commercial') && $request->nom_commercial !== $produit->nom_commercial) {
@@ -214,7 +247,34 @@ class ProduitController extends Controller
                 $data['featured'] = $request->boolean('featured');
             }
 
+            // Upload direct de l'image principale si fichier envoyé
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $newFileName = uniqid('main_') . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('produits', $newFileName, 'public');
+                $data['url_image'] = 'storage/produits/' . $newFileName;
+            } elseif ($request->hasFile('image_principale')) {
+                $file = $request->file('image_principale');
+                $newFileName = uniqid('main_') . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('produits', $newFileName, 'public');
+                $data['url_image'] = 'storage/produits/' . $newFileName;
+            }
+
             $produit->update($data);
+
+            // Synchroniser la relation ProduitImage principale
+            if (!empty($data['url_image'])) {
+                ProduitImage::where('produit_id', $produit->id)->update(['principale' => false]);
+                ProduitImage::updateOrCreate(
+                    ['produit_id' => $produit->id, 'url_image' => $data['url_image']],
+                    [
+                        'nom_fichier' => basename($data['url_image']),
+                        'alt_text' => 'Image principale de ' . $produit->nom_commercial,
+                        'ordre_affichage' => 0,
+                        'principale' => true,
+                    ]
+                );
+            }
 
             // Synchroniser les catégories
             if ($request->has('categories')) {
@@ -228,23 +288,23 @@ class ProduitController extends Controller
                 $produit->categories()->sync($syncData);
             }
 
-            // Upload de nouvelles images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $fileName = $image->getClientOriginalName();
-                $newFileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
-                $image->storeAs('produits', $newFileName, 'public');
+            // Upload de nouvelles images de galerie
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $index => $image) {
+                    $fileName = $image->getClientOriginalName();
+                    $newFileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
+                    $image->storeAs('produits', $newFileName, 'public');
 
-                ProduitImage::create([
-                    'produit_id' => $produit->id,
-                    'nom_fichier' => $fileName,
-                    'url_image' => 'storage/produits/' . $newFileName,
-                    'alt_text' => 'Image de ' . $produit->nom_commercial,
-                    'ordre_affichage' => $produit->images()->count() + $index,
-                    'principale' => false,
-                ]);
+                    ProduitImage::create([
+                        'produit_id' => $produit->id,
+                        'nom_fichier' => $fileName,
+                        'url_image' => 'storage/produits/' . $newFileName,
+                        'alt_text' => 'Image de ' . $produit->nom_commercial,
+                        'ordre_affichage' => $produit->images()->count() + $index,
+                        'principale' => false,
+                    ]);
+                }
             }
-        }
 
             DB::commit();
 
@@ -258,29 +318,13 @@ class ProduitController extends Controller
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Erreur lors de la mise à jour : ' . $e->getMessage(),
+                'message' => 'Erreur lors de la mise à jour du produit : ' . $e->getMessage(),
             ], 500);
         }
     }
 
     /**
-     * DELETE /api/admin/produits/{id}
-     * Soft delete : passe le statut en inactif.
-     */
-    public function destroy(int $id): JsonResponse
-    {
-        $produit = Produit::findOrFail($id);
-        $produit->update(['statut' => 'inactif']);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Produit supprimé avec succès.',
-        ]);
-    }
-
-    /**
      * POST /api/admin/produits/{id}/toggle-featured
-     * Toggle du statut vedette.
      */
     public function toggleFeatured(int $id): JsonResponse
     {
@@ -290,28 +334,40 @@ class ProduitController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Statut vedette mis à jour.',
-            'data' => ['featured' => $produit->fresh()->featured],
+            'featured' => $produit->featured,
         ]);
     }
 
     /**
      * DELETE /api/admin/produits/{produitId}/images/{imageId}
-     * Suppression d'une image de produit.
      */
     public function deleteImage(int $produitId, int $imageId): JsonResponse
     {
-        $image = ProduitImage::where('produit_id', $produitId)
-            ->where('id', $imageId)
-            ->firstOrFail();
-
-        // Supprimer le fichier physique
-        Storage::disk('public')->delete('produits/' . basename($image->url_image));
+        $image = ProduitImage::where('produit_id', $produitId)->where('id', $imageId)->firstOrFail();
+        
+        if ($image->url_image && Storage::disk('public')->exists(str_replace('storage/', '', $image->url_image))) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $image->url_image));
+        }
 
         $image->delete();
 
         return response()->json([
             'status' => 'success',
             'message' => 'Image supprimée avec succès.',
+        ]);
+    }
+
+    /**
+     * DELETE /api/admin/produits/{id}
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $produit = Produit::findOrFail($id);
+        $produit->update(['statut' => 'inactif']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Produit désactivé avec succès.',
         ]);
     }
 }

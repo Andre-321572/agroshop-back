@@ -27,15 +27,23 @@ class CommandeController extends Controller
             ->leftJoin('commande_articles as ca', 'commandes.id', '=', 'ca.commande_id')
             ->groupBy('commandes.id');
 
-        // Filtre par date (par défaut aujourd'hui)
-        $dateDebut = $request->input('date_debut', now()->toDateString());
-        $dateFin = $request->input('date_fin', now()->toDateString());
-        $query->whereDate('commandes.created_at', '>=', $dateDebut)
-              ->whereDate('commandes.created_at', '<=', $dateFin);
+        // Filtre par date (optionnel)
+        if ($request->filled('date_debut')) {
+            $query->whereDate('commandes.created_at', '>=', $request->input('date_debut'));
+        }
+        if ($request->filled('date_fin')) {
+            $query->whereDate('commandes.created_at', '<=', $request->input('date_fin'));
+        }
 
-        // Filtre par référence
-        if ($ref = $request->input('search_reference')) {
-            $query->where('commandes.code_reference', 'LIKE', "%{$ref}%");
+        // Filtre par référence ou client
+        if ($ref = $request->input('search_reference') ?: $request->input('search')) {
+            $searchTerm = "%{$ref}%";
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('commandes.code_reference', 'LIKE', $searchTerm)
+                  ->orWhere('commandes.nom_client', 'LIKE', $searchTerm)
+                  ->orWhere('commandes.prenom_client', 'LIKE', $searchTerm)
+                  ->orWhere('commandes.telephone_client', 'LIKE', $searchTerm);
+            });
         }
 
         // Filtre par statut
@@ -45,18 +53,12 @@ class CommandeController extends Controller
             }
         }
 
-        $perPage = $request->input('per_page', 15);
+        $perPage = $request->input('per_page', 100);
         $commandes = $query->orderBy('commandes.created_at', 'desc')->paginate($perPage);
 
-        // Statistiques de la période
-        $statsWhere = Commande::whereDate('created_at', '>=', $dateDebut)
-            ->whereDate('created_at', '<=', $dateFin);
-
-        $totalVentes = (clone $statsWhere)->where('statut_commande', 'confirmee')
-            ->sum('montant_total');
-
-        $statsStatuts = (clone $statsWhere)
-            ->selectRaw('statut_commande, COUNT(*) as count')
+        // Statistiques globales
+        $totalVentes = Commande::whereIn('statut_commande', ['confirmee', 'livree', 'expediee', 'preparee'])->sum('montant_total');
+        $statsStatuts = Commande::selectRaw('statut_commande, COUNT(*) as count')
             ->groupBy('statut_commande')
             ->pluck('count', 'statut_commande');
 

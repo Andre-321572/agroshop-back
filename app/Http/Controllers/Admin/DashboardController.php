@@ -15,17 +15,20 @@ class DashboardController extends Controller
 {
     /**
      * GET /api/admin/dashboard
-     * Statistiques générales du tableau de bord admin (Cache optimisé 60s).
+     * Statistiques générales du tableau de bord admin (Cache optimisé 5s).
      */
     public function index(): JsonResponse
     {
-        $dashboardData = Cache::remember('admin_dashboard_cache', 60, function () {
-            // Statistiques générales
-            $totalVentes = Commande::where('statut_commande', '!=', 'annulee')->sum('montant_total');
+        Cache::forget('admin_dashboard_cache');
 
+        $dashboardData = Cache::remember('admin_dashboard_cache', 5, function () {
+            // Commandes validées (Confirmées, Préparées, Expédiées, Livrées)
             $commandesValidees = Commande::whereIn('statut_commande', ['confirmee', 'preparee', 'expediee', 'livree'])
                 ->selectRaw('COUNT(*) as total, COALESCE(SUM(montant_total), 0) as montant')
                 ->first();
+
+            // Total des ventes = Uniquement les commandes confirmées/livrées (exclut en_attente & annulee)
+            $totalVentes = (float) ($commandesValidees->montant ?? 0);
 
             $commandesAttente = Commande::where('statut_commande', 'en_attente')
                 ->selectRaw('COUNT(*) as total, COALESCE(SUM(montant_total), 0) as montant')
@@ -39,17 +42,17 @@ class DashboardController extends Controller
             $clientsTotal = Commande::distinct('telephone')->count('telephone');
             $commandesTotalCount = Commande::count();
 
-            // 5 dernières commandes
+            // 6 dernières commandes
             $dernieresCommandes = Commande::orderBy('created_at', 'desc')
                 ->limit(6)
                 ->get(['id', 'reference_commande', 'code_reference', 'nom_client', 'prenom_client', 'telephone', 'telephone_client', 'montant_total', 'statut_commande', 'statut_paiement', 'created_at']);
 
             return [
                 'stats' => [
-                    'total_ventes' => (float) $totalVentes,
-                    'chiffre_affaires' => (float) $totalVentes,
+                    'total_ventes' => $totalVentes,
+                    'chiffre_affaires' => $totalVentes,
                     'commandes_validees' => (int) ($commandesValidees->total ?? 0),
-                    'ventes_validees' => (float) ($commandesValidees->montant ?? 0),
+                    'ventes_validees' => $totalVentes,
                     'commandes_attente' => (int) ($commandesAttente->total ?? 0),
                     'ventes_attente' => (float) ($commandesAttente->montant ?? 0),
                     'commandes_en_cours' => $commandesEnCours,
