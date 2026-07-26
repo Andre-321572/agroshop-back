@@ -18,6 +18,10 @@ class AuthController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
+        if (!$request->has('password') && $request->has('mot_de_passe')) {
+            $request->merge(['password' => $request->input('mot_de_passe')]);
+        }
+
         $request->validate([
             'email' => 'required|email|max:150',
             'password' => 'required|string|min:6',

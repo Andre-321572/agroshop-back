@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\ArticleBlogController as AdminArticleBlogControll
 use App\Http\Controllers\Admin\AdministrateurController as AdminAdministrateurController;
 use App\Http\Controllers\Admin\ParametreSystemeController as AdminParametreSystemeController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
+use App\Http\Controllers\Admin\VisiteController as AdminVisiteController;
 
 // --- Controllers Client / Public ---
 use App\Http\Controllers\Client\HomeController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\Client\BlogController;
 use App\Http\Controllers\Client\ContactController;
 use App\Http\Controllers\Client\ParametreController;
 use App\Http\Controllers\Client\FaqController;
+use App\Http\Controllers\Client\VisiteController as ClientVisiteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +35,9 @@ use App\Http\Controllers\Client\FaqController;
 // =========================================================================
 // 1. ROUTES PUBLIQUES CLIENT / E-COMMERCE (Web & Mobile App)
 // =========================================================================
+
+// --- Tracking des visites et actions ---
+Route::post('/track-visite', [ClientVisiteController::class, 'store']);
 
 // --- Page d'accueil ---
 Route::get('/home', [HomeController::class, 'index']);
@@ -79,8 +84,10 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AdminAuthController::class, 'logout']);
     Route::get('/me', [AdminAuthController::class, 'me']);
 
-    // Tableau de bord
+    // Tableau de bord & Tracking Visiteurs
     Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    Route::get('/visites', [AdminVisiteController::class, 'index']);
+    Route::get('/visites/ip-details', [AdminVisiteController::class, 'ipDetails']);
 
     // Produits
     Route::apiResource('produits', AdminProduitController::class);
