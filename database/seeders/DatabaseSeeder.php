@@ -37,6 +37,17 @@ class DatabaseSeeder extends Seeder
         );
 
         Administrateur::updateOrCreate(
+            ['email' => 'admin@agroshop.tg'],
+            [
+                'nom' => 'Super',
+                'prenom' => 'Admin',
+                'mot_de_passe' => Hash::make('password123'),
+                'role' => 'super_admin',
+                'actif' => true,
+            ]
+        );
+
+        Administrateur::updateOrCreate(
             ['email' => 'sewodakomla@gmail.com'],
             [
                 'nom' => 'Sewoda',
