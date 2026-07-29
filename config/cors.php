@@ -1,12 +1,21 @@
 <?php
+
 return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
     'allowed_methods' => ['*'],
-    'allowed_origins' => [
+    'allowed_origins' => array_filter([
         env('FRONTEND_URL', 'http://localhost:3000'),
+        'https://agroshoptg.digitalforges.org',
+        'https://www.agroshoptg.digitalforges.org',
+        'https://agroshoptg.store',
+        'https://www.agroshoptg.store',
+        'https://agroshop.tg.digitalforges.org',
+        'https://www.agroshop.tg.digitalforges.org',
         'https://agrooshop.tg.digitalforges.org',
-        'https://www.agrooshoptg.digitalforges.org',
-    ],
+        'https://www.agrooshop.tg.digitalforges.org',
+        'http://localhost:3000',
+        'http://localhost:8000',
+    ]),
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
