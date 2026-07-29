@@ -47,6 +47,10 @@ return [
             'driver' => 'sanctum',
             'provider' => 'administrateurs',
         ],
+        'gestionnaire' => [
+            'driver' => 'sanctum',
+            'provider' => 'gestionnaires',
+        ],
     ],
 
     /*
@@ -75,6 +79,11 @@ return [
         'administrateurs' => [
             'driver' => 'eloquent',
             'model' => Administrateur::class,
+        ],
+
+        'gestionnaires' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Gestionnaire::class,
         ],
     ],
 

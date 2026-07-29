@@ -127,4 +127,37 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::get('/parametres', [AdminParametreSystemeController::class, 'index']);
     Route::get('/parametres/{cle}', [AdminParametreSystemeController::class, 'show']);
     Route::put('/parametres/{cle}', [AdminParametreSystemeController::class, 'update']);
+
+    // --- Multi-Boutiques & Délégués ---
+    Route::apiResource('boutiques', \App\Http\Controllers\Api\Admin\BoutiqueController::class);
+    Route::apiResource('gestionnaires', \App\Http\Controllers\Api\Admin\GestionnaireController::class);
+    Route::get('/dashboard/stats-generales', [\App\Http\Controllers\Api\Admin\DashboardController::class, 'statsGenerales']);
+    
+    // Rapports
+    Route::get('/rapports', [\App\Http\Controllers\Api\Admin\RapportController::class, 'index']);
+    Route::post('/rapports/{id}/marquer-lu', [\App\Http\Controllers\Api\Admin\RapportController::class, 'marquerCommeLu']);
+    Route::get('/rapports/{id}/telecharger', [\App\Http\Controllers\Api\Admin\RapportController::class, 'telecharger']);
+
+    // Assistant IA
+    Route::post('/ai/chat', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'chat']);
+});
+
+// =========================================================================
+// 3. ROUTES GESTIONNAIRE DE BOUTIQUE
+// =========================================================================
+Route::prefix('gestionnaire')->group(function () {
+    Route::post('/login', [\App\Http\Controllers\Api\Gestionnaire\AuthController::class, 'login']);
+});
+
+Route::prefix('gestionnaire')->middleware('auth:sanctum,gestionnaire')->group(function () {
+    Route::post('/logout', [\App\Http\Controllers\Api\Gestionnaire\AuthController::class, 'logout']);
+    
+    Route::get('/dashboard', [\App\Http\Controllers\Api\Gestionnaire\DashboardController::class, 'stats']);
+    
+    Route::get('/stock', [\App\Http\Controllers\Api\Gestionnaire\StockController::class, 'index']);
+    Route::post('/stock/ajuster/{produit_id}', [\App\Http\Controllers\Api\Gestionnaire\StockController::class, 'ajuster']);
+    
+    Route::post('/ventes', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'store']);
+    
+    Route::post('/rapports/generer', [\App\Http\Controllers\Api\Gestionnaire\RapportController::class, 'genererEtEnvoyer']);
 });
