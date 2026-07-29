@@ -145,19 +145,23 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
 // =========================================================================
 // 3. ROUTES GESTIONNAIRE DE BOUTIQUE
 // =========================================================================
+
+// --- Auth Gestionnaire (Public) ---
 Route::prefix('gestionnaire')->group(function () {
     Route::post('/login', [\App\Http\Controllers\Api\Gestionnaire\AuthController::class, 'login']);
 });
 
-Route::prefix('gestionnaire')->middleware('auth:sanctum,gestionnaire')->group(function () {
+// --- Actions Gestionnaire Protégées ---
+Route::prefix('gestionnaire')->middleware('auth:gestionnaire')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Api\Gestionnaire\AuthController::class, 'logout']);
-    
+    Route::get('/me',     [\App\Http\Controllers\Api\Gestionnaire\AuthController::class, 'me']);
+
     Route::get('/dashboard', [\App\Http\Controllers\Api\Gestionnaire\DashboardController::class, 'stats']);
-    
+
     Route::get('/stock', [\App\Http\Controllers\Api\Gestionnaire\StockController::class, 'index']);
     Route::post('/stock/ajuster/{produit_id}', [\App\Http\Controllers\Api\Gestionnaire\StockController::class, 'ajuster']);
-    
+
     Route::post('/ventes', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'store']);
-    
+
     Route::post('/rapports/generer', [\App\Http\Controllers\Api\Gestionnaire\RapportController::class, 'genererEtEnvoyer']);
 });
