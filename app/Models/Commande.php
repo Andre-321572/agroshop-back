@@ -57,4 +57,9 @@ class Commande extends Model
     {
         return $this->hasMany(CommandeSuivi::class, 'commande_id')->orderBy('created_at', 'desc');
     }
+
+    public function boutique()
+    {
+        return $this->belongsTo(Boutique::class);
+    }
 }

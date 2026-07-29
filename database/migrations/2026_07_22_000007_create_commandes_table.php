@@ -38,6 +38,10 @@ return new class extends Migration
             $table->string('commentaire', 255)->nullable();
             $table->string('ip_client', 45)->nullable();
             $table->text('user_agent')->nullable();
+            
+            // Nouvelle colonne pour le multi-boutiques
+            $table->foreignId('boutique_id')->nullable()->constrained('boutiques')->onDelete('set null');
+            
             $table->timestamps();
 
             // Optimisation d'Indexation

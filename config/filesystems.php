@@ -40,8 +40,8 @@ return [
 
         'public' => [
             'driver' => 'local',
-            // En production (sur LWS), on pointe vers htdocs/apiv1.kirefrais.com/storage
-            // En local, on garde le comportement normal (storage/app/public)
+            // 'root' => storage_path('app/public'),
+            // 'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
             'root' => env('APP_ENV') === 'production' 
                         ? base_path('../agrooshop.tg.digitalforges.org/storage') 
                         : storage_path('app/public'),
