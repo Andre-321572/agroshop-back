@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Gestionnaire;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class GestionnaireController extends Controller
 {
@@ -41,7 +40,7 @@ class GestionnaireController extends Controller
             'prenom'    => $validated['prenom'],
             'email'     => $validated['email'],
             'telephone' => $validated['telephone'] ?? null,
-            'password'  => Hash::make($validated['password']),
+            'password'  => $validated['password'], // Cast 'hashed' hash automatiquement
             'statut'    => $validated['statut'] ?? 'actif',
         ]);
 
@@ -84,11 +83,7 @@ class GestionnaireController extends Controller
             'statut'       => 'nullable|in:actif,inactif',
         ]);
 
-        if ($request->filled('password')) {
-            $request->validate(['password' => 'string|min:8']);
-            $validated['password'] = Hash::make($request->password);
-        }
-
+        // Mettre à jour les informations principales
         $gestionnaire->update([
             'nom'       => $validated['nom'],
             'prenom'    => $validated['prenom'],
@@ -97,8 +92,10 @@ class GestionnaireController extends Controller
             'statut'    => $validated['statut'] ?? $gestionnaire->statut,
         ]);
 
-        if (isset($validated['password'])) {
-            $gestionnaire->update(['password' => $validated['password']]);
+        // Mettre à jour le mot de passe si fourni (cast 'hashed' hash auto)
+        if ($request->filled('password')) {
+            $request->validate(['password' => 'string|min:8']);
+            $gestionnaire->update(['password' => $request->password]);
         }
 
         // Sync boutiques (remplace toutes les associations)
