@@ -130,6 +130,80 @@ class DashboardController extends Controller
                     'created_at'
                 ]);
 
+            // ── Alertes opérationnelles (Temps réel) ──
+            $produitsEnRuptureList = Produit::where('statut', 'actif')
+                ->whereColumn('stock_disponible', '<=', 'stock_alerte')
+                ->limit(5)
+                ->get(['id', 'nom_commercial', 'stock_disponible', 'stock_alerte', 'slug']);
+
+            $totalProduitsRupture = Produit::where('statut', 'actif')
+                ->whereColumn('stock_disponible', '<=', 'stock_alerte')
+                ->count();
+
+            $commandesSouffranceCount = Commande::where('statut_commande', 'en_attente')
+                ->where('created_at', '<=', Carbon::now()->subHours(2))
+                ->count();
+
+            $paiementsAttenteCount = Commande::where('statut_paiement', 'en_attente')->count();
+
+            // ── Ventes par Catégorie ──
+            $ventesCategories = DB::table('categories')
+                ->leftJoin('produit_categories', 'categories.id', '=', 'produit_categories.categorie_id')
+                ->leftJoin('produits', 'produit_categories.produit_id', '=', 'produits.id')
+                ->leftJoin('commande_articles', 'produits.id', '=', 'commande_articles.produit_id')
+                ->leftJoin('commandes', function ($join) {
+                    $join->on('commande_articles.commande_id', '=', 'commandes.id')
+                        ->whereIn('commandes.statut_commande', ['confirmee', 'preparee', 'expediee', 'livree']);
+                })
+                ->select(
+                    'categories.id',
+                    'categories.nom as nom_categorie',
+                    'categories.slug',
+                    DB::raw('COUNT(DISTINCT produits.id) as total_produits'),
+                    DB::raw('COALESCE(SUM(commande_articles.montant_ligne), 0) as total_ventes')
+                )
+                ->where('categories.actif', true)
+                ->groupBy('categories.id', 'categories.nom', 'categories.slug')
+                ->orderByDesc('total_ventes')
+                ->limit(5)
+                ->get();
+
+            // ── Répartition des Modes & Statuts de Paiement ──
+            $modesPaiementData = Commande::select('statut_paiement', DB::raw('COUNT(*) as total'), DB::raw('COALESCE(SUM(montant_total), 0) as montant'))
+                ->groupBy('statut_paiement')
+                ->get();
+
+            // ── Top 5 Produits les Plus Vendus vs Stock ──
+            $topProduits = DB::table('produits')
+                ->leftJoin('commande_articles', 'produits.id', '=', 'commande_articles.produit_id')
+                ->leftJoin('commandes', function ($join) {
+                    $join->on('commande_articles.commande_id', '=', 'commandes.id')
+                        ->whereIn('commandes.statut_commande', ['confirmee', 'preparee', 'expediee', 'livree']);
+                })
+                ->select(
+                    'produits.id',
+                    'produits.nom_commercial',
+                    'produits.stock_disponible',
+                    'produits.prix_unitaire',
+                    DB::raw('COALESCE(SUM(commande_articles.quantite), 0) as total_vendu'),
+                    DB::raw('COALESCE(SUM(commande_articles.montant_ligne), 0) as total_revenu')
+                )
+                ->where('produits.statut', 'actif')
+                ->groupBy('produits.id', 'produits.nom_commercial', 'produits.stock_disponible', 'produits.prix_unitaire')
+                ->orderByDesc('total_vendu')
+                ->orderByDesc('produits.stock_disponible')
+                ->limit(5)
+                ->get();
+
+            // ── Ventes par Ville / Zone Logistique ──
+            $ventesVilles = Commande::select('ville', DB::raw('COUNT(*) as total_commandes'), DB::raw('COALESCE(SUM(montant_total), 0) as montant_total'))
+                ->whereNotNull('ville')
+                ->where('ville', '!=', '')
+                ->groupBy('ville')
+                ->orderByDesc('montant_total')
+                ->limit(5)
+                ->get();
+
             return [
                 'stats' => [
                     'total_commandes' => $commandesTotalCount,
@@ -152,7 +226,17 @@ class DashboardController extends Controller
                     'ca_mois_courant' => $caMoisCourant,
                     'ca_mois_precedent' => $caMoisPrecedent,
                 ],
+                'alerts' => [
+                    'produits_rupture' => $produitsEnRuptureList,
+                    'total_produits_rupture' => $totalProduitsRupture,
+                    'commandes_souffrance' => $commandesSouffranceCount,
+                    'paiements_attente' => $paiementsAttenteCount,
+                ],
                 'ventes_mensuelles' => $ventesMensuelles,
+                'ventes_categories' => $ventesCategories,
+                'modes_paiement' => $modesPaiementData,
+                'top_produits' => $topProduits,
+                'ventes_villes' => $ventesVilles,
                 'dernieres_commandes' => $dernieresCommandes,
             ];
         });
