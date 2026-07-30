@@ -18,7 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin/*'
         ]);
         $middleware->statefulApi();
+        $middleware->redirectGuestsTo(fn () => route('login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->shouldRenderJsonWhen(function ($request, $e) {
+            if ($request->is('api/*')) {
+                return true;
+            }
+            return $request->expectsJson();
+        });
     })->create();

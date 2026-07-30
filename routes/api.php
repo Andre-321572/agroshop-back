@@ -32,6 +32,11 @@ use App\Http\Controllers\Client\VisiteController as ClientVisiteController;
 |--------------------------------------------------------------------------
 */
 
+// --- Fallback pour l'authentification API (évite l'erreur Route [login] not defined) ---
+Route::get('/unauthorized', function () {
+    return response()->json(['message' => 'Unauthenticated. Token invalide ou expiré.'], 401);
+})->name('login');
+
 // =========================================================================
 // 1. ROUTES PUBLIQUES CLIENT / E-COMMERCE (Web & Mobile App)
 // =========================================================================
