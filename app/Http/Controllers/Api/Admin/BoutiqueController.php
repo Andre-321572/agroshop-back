@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Boutique;
+use App\Models\Produit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BoutiqueController extends Controller
 {
@@ -16,6 +18,110 @@ class BoutiqueController extends Controller
             ->map(fn($b) => $this->format($b));
 
         return response()->json(['data' => $boutiques]);
+    }
+
+    /**
+     * Obtenir tous les produits du catalogue avec leur état dans cette boutique
+     */
+    public function getProduitsApprovisionnement($id)
+    {
+        $boutique = Boutique::findOrFail($id);
+
+        $produits = Produit::with('categorie:id,nom')
+            ->select('id', 'nom_commercial', 'categorie_id', 'prix_unitaire', 'unite_mesure')
+            ->orderBy('nom_commercial')
+            ->get();
+
+        $existingPivot = DB::table('boutique_produit')
+            ->where('boutique_id', $id)
+            ->get()
+            ->keyBy('produit_id');
+
+        $data = $produits->map(function ($p) use ($existingPivot) {
+            $pivot = $existingPivot->get($p->id);
+            return [
+                'id'             => $p->id,
+                'nom_commercial' => $p->nom_commercial,
+                'categorie_nom'  => $p->categorie ? $p->categorie->nom : 'Général',
+                'prix_unitaire'  => (float) $p->prix_unitaire,
+                'unite_mesure'   => $p->unite_mesure,
+                'stock_actuel'   => $pivot ? (int) $pivot->stock_disponible : 0,
+                'stock_alerte'   => $pivot ? (int) $pivot->stock_alerte : 10,
+                'deja_associe'   => $pivot !== null,
+            ];
+        });
+
+        return response()->json([
+            'boutique' => [
+                'id'  => $boutique->id,
+                'nom' => $boutique->nom,
+            ],
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Approvisionner la boutique avec une liste de produits et quantités
+     */
+    public function approvisionner(Request $request, $id)
+    {
+        $boutique = Boutique::findOrFail($id);
+
+        $validated = $request->validate([
+            'items'                => 'required|array|min:1',
+            'items.*.produit_id'   => 'required|exists:produits,id',
+            'items.*.quantite'     => 'required|integer|min:1',
+            'items.*.stock_alerte' => 'nullable|integer|min:1',
+        ], [
+            'items.required' => 'Veuillez cocher et renseigner au moins un produit à approvisionner.',
+            'items.min'      => 'Veuillez sélectionner au moins un produit.',
+        ]);
+
+        $approvisionnesCount = 0;
+        $totalQuantiteAjoutee = 0;
+
+        foreach ($validated['items'] as $item) {
+            $produitId = $item['produit_id'];
+            $quantite  = (int) $item['quantite'];
+            $alerte    = isset($item['stock_alerte']) ? (int) $item['stock_alerte'] : 10;
+
+            $pivot = DB::table('boutique_produit')
+                ->where('boutique_id', $id)
+                ->where('produit_id', $produitId)
+                ->first();
+
+            if ($pivot) {
+                DB::table('boutique_produit')
+                    ->where('boutique_id', $id)
+                    ->where('produit_id', $produitId)
+                    ->update([
+                        'stock_disponible' => $pivot->stock_disponible + $quantite,
+                        'stock_alerte'     => $alerte > 0 ? $alerte : $pivot->stock_alerte,
+                        'updated_at'       => now(),
+                    ]);
+            } else {
+                DB::table('boutique_produit')->insert([
+                    'boutique_id'      => $id,
+                    'produit_id'       => $produitId,
+                    'stock_disponible' => $quantite,
+                    'stock_alerte'     => $alerte,
+                    'created_at'       => now(),
+                    'updated_at'       => now(),
+                ]);
+            }
+
+            $approvisionnesCount++;
+            $totalQuantiteAjoutee += $quantite;
+        }
+
+        return response()->json([
+            'message' => "Approvisionnement réussi ! {$approvisionnesCount} produit(s) mis à jour ({$totalQuantiteAjoutee} unités ajoutées).",
+            'boutique' => [
+                'id'             => $boutique->id,
+                'nom'            => $boutique->nom,
+                'produits_count' => $boutique->produits()->count(),
+            ]
+        ]);
     }
 
     public function store(Request $request)
