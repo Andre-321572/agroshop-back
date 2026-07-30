@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        
         Administrateur::updateOrCreate(
             ['email' => 'admin@agroshop.tg'],
             [
