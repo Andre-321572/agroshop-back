@@ -31,13 +31,44 @@ class RapportController extends Controller
     public function telecharger($id)
     {
         $rapport = Rapport::findOrFail($id);
-        
-        if (!Storage::disk('public')->exists($rapport->fichier_pdf)) {
-            return response()->json(['message' => 'Fichier introuvable sur le serveur.'], 404);
+
+        $disk = Storage::disk('public');
+        $fichier = $rapport->fichier_pdf;
+
+        if (!$fichier || !$disk->exists($fichier)) {
+            return response()->json([
+                'message' => 'Fichier introuvable sur le serveur. Le PDF n\'a peut-être pas encore été généré.',
+                'rapport_id' => $rapport->id,
+                'fichier' => $fichier
+            ], 404);
         }
 
-        $rapport->update(['statut_lecture' => true]);
+        try {
+            $rapport->update(['statut_lecture' => true]);
+        } catch (\Throwable $e) {
+        }
 
-        return Storage::disk('public')->download($rapport->fichier_pdf);
+        $fileName = $rapport->titre
+            ? preg_replace('/[^a-zA-Z0-9_-]/', '_', $rapport->titre) . '.pdf'
+            : 'rapport-' . $rapport->id . '.pdf';
+
+        $cheminComplet = $disk->path($fichier);
+        $mimeType = function_exists('mime_content_type') && is_file($cheminComplet)
+            ? mime_content_type($cheminComplet)
+            : 'application/pdf';
+        if (!$mimeType || $mimeType === false) {
+            $mimeType = 'application/pdf';
+        }
+
+        $headers = [
+            'Content-Type' => $mimeType,
+            'Content-Description' => 'File Transfer',
+            'Content-Transfer-Encoding' => 'binary',
+            'Expires' => '0',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Pragma' => 'public',
+        ];
+
+        return response()->download($cheminComplet, $fileName, $headers);
     }
 }
