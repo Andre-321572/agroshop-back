@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Groq AI — API pour LLM (Llama 3.1, Mixtral, etc.)
+    |--------------------------------------------------------------------------
+    | Obtenir une clé : https://console.groq.com/keys
+    */
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'model'   => env('GROQ_MODEL', 'llama-3.1-70b-versatile'),
+    ],
+
 ];

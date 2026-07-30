@@ -72,6 +72,9 @@ Route::get('/parametres', [ParametreController::class, 'index']);
 // --- FAQ ---
 Route::get('/faq', [FaqController::class, 'index']);
 
+// --- IA publique : recommandations produits (sans auth, optimisé pour panier / fiche produit)
+Route::post('/ai/produits/recommandations', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'produitsRecommandes']);
+
 
 // =========================================================================
 // 2. ROUTES ADMINISTRATION (Admin Panel API)
@@ -143,8 +146,14 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::post('/rapports/{id}/marquer-lu', [\App\Http\Controllers\Api\Admin\RapportController::class, 'marquerCommeLu']);
     Route::get('/rapports/{id}/telecharger', [\App\Http\Controllers\Api\Admin\RapportController::class, 'telecharger']);
 
-    // Assistant IA
+    // Assistant IA — endpoints spécialisés
     Route::post('/ai/chat', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'chat']);
+    Route::post('/ai/produits/generer-fiche', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'genererFicheProduit']);
+    Route::post('/ai/produits/valider-saisie', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'validerSaisieProduit']);
+    Route::get('/ai/boutiques/{boutiqueId}/suggerer-reappro', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'suggererReappro']);
+    Route::post('/ai/rapports/generer', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'genererRapport']);
+    Route::get('/ai/dashboard/insights', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'dashboardInsights']);
+    Route::post('/ai/blog/generer-article', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'genererArticleBlog']);
 });
 
 // =========================================================================
@@ -169,4 +178,9 @@ Route::prefix('gestionnaire')->middleware('auth:gestionnaire')->group(function (
     Route::post('/ventes', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'store']);
 
     Route::post('/rapports/generer', [\App\Http\Controllers\Api\Gestionnaire\RapportController::class, 'genererEtEnvoyer']);
+
+    // --- Assistant IA — endpoints Gestionnaire
+    Route::post('/ai/rapports/generer', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'genererRapport']);
+    Route::get('/ai/boutiques/{boutiqueId}/suggerer-reappro', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'suggererReappro']);
+    Route::post('/ai/produits/valider-saisie', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'validerSaisieProduit']);
 });
