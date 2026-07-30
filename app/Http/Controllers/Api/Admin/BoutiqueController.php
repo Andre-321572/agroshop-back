@@ -24,13 +24,14 @@ class BoutiqueController extends Controller
             'nom'          => 'required|string|max:255',
             'type'         => 'nullable|string|max:255',
             'types'        => 'nullable|array',
+            'types.*'      => 'required|string|in:quincaillerie,agricole',
             'localisation' => 'nullable|string|max:255',
             'description'  => 'nullable|string',
             'is_active'    => 'nullable|boolean',
         ]);
 
-        // Déterminer la chaîne de type (ex: "quincaillerie,agricole" ou "quincaillerie")
         $typeStr = $this->resolveTypeString($validated);
+        $this->assertTypeStringValide($typeStr);
 
         $boutique = Boutique::create([
             'nom'         => $validated['nom'],
@@ -61,12 +62,14 @@ class BoutiqueController extends Controller
             'nom'          => 'required|string|max:255',
             'type'         => 'nullable|string|max:255',
             'types'        => 'nullable|array',
+            'types.*'      => 'required|string|in:quincaillerie,agricole',
             'localisation' => 'nullable|string|max:255',
             'description'  => 'nullable|string',
             'is_active'    => 'nullable|boolean',
         ]);
 
         $typeStr = $this->resolveTypeString($validated, $boutique->type);
+        $this->assertTypeStringValide($typeStr);
 
         $boutique->update([
             'nom'         => $validated['nom'],
@@ -109,6 +112,32 @@ class BoutiqueController extends Controller
             return $validated['type'];
         }
         return $fallback ?? 'agricole';
+    }
+
+    /**
+     * Vérifie que chaque élément de la chaîne type (séparée par virgules)
+     * est une valeur autorisée (quincaillerie ou agricole).
+     * Lève une ValidationException si une valeur inconnue est détectée.
+     */
+    private function assertTypeStringValide(string $typeStr): void
+    {
+        $autorises = ['quincaillerie', 'agricole'];
+        $types = array_values(array_filter(explode(',', $typeStr)));
+
+        if (count($types) === 0) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'type' => 'Au moins un type de boutique est requis.',
+            ]);
+        }
+
+        foreach ($types as $t) {
+            $t = trim($t);
+            if (!in_array($t, $autorises, true)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'type' => "Le type \"{$t}\" n'est pas autorisé. Valeurs acceptées : " . implode(', ', $autorises) . '.',
+                ]);
+            }
+        }
     }
 
     /**
