@@ -49,6 +49,11 @@ class Produit extends Model
                     ->withPivot('principale');
     }
 
+    public function categorie()
+    {
+        return $this->belongsTo(Categorie::class, 'categorie_id');
+    }
+
     public function images()
     {
         return $this->hasMany(ProduitImage::class, 'produit_id')->orderBy('ordre_affichage');
