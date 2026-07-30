@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Produit;
 use App\Models\Categorie;
+use App\Services\AiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProduitController extends Controller
 {
@@ -99,6 +101,81 @@ class ProduitController extends Controller
                 'produit' => $produit,
                 'produits_similaires' => $produitsSimilaires,
             ],
+        ]);
+    }
+
+    /**
+     * POST /api/produits/recherche-ia
+     * Recherche sémantique assistée par IA avec conseil agronomique.
+     */
+    public function rechercheIa(Request $request, AiService $aiService): JsonResponse
+    {
+        $queryText = trim($request->input('query', ''));
+        if (empty($queryText)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Veuillez saisir un terme ou une question de recherche.',
+                'data' => []
+            ], 400);
+        }
+
+        // 1. Mise en cache de la réponse IA pour les requêtes identiques (3 heures)
+        $cacheKey = 'ai_search_v1_' . md5(mb_strtolower($queryText));
+        $aiResult = Cache::remember($cacheKey, now()->addHours(3), function () use ($queryText, $aiService) {
+            $prompt = <<<PROMPT
+Un client/agriculteur au Togo recherche dans notre boutique agricole : "{$queryText}".
+
+Analyse cette requête et réponds UNIQUEMENT un JSON structuré ainsi :
+{
+  "mots_cles": ["3 à 5 mots-clés techniques ou noms de molécules/matières/produits"],
+  "categorie_recommandee": "Engrais|Pesticides|Semences|Matériel|Toutes",
+  "conseil_agronome": "Explication agronomique bienveillante et concise (2-3 phrases max) pour guider le choix du produit, adaptée aux conditions du Togo."
+}
+PROMPT;
+
+            $sys = "Tu es l'Ingénieur Agronome virtuel d'AgroShop Togo. Tu conseilles les agriculteurs sur les traitements, engrais, semences et matériels.";
+
+            return $aiService->chatJson($prompt, $sys);
+        });
+
+        // 2. Extraction des mots-clés IA ou repli sur les mots de la requête
+        $motsCles = $aiResult['mots_cles'] ?? array_filter(explode(' ', $queryText), fn($w) => mb_strlen($w) > 2);
+        if (empty($motsCles)) {
+            $motsCles = [$queryText];
+        }
+
+        // 3. Recherche SQL pondérée sur les produits actifs
+        $query = Produit::actif()->with(['imagePrincipale', 'categories:id,nom,slug']);
+
+        $query->where(function ($q) use ($motsCles, $queryText) {
+            // Correspondance directe exacte en priorité
+            $searchTerm = "%{$queryText}%";
+            $q->where('nom_commercial', 'LIKE', $searchTerm)
+              ->orWhere('description', 'LIKE', $searchTerm)
+              ->orWhere('composition', 'LIKE', $searchTerm);
+
+            // Correspondance sur les mots-clés agronomiques identifiés par l'IA
+            foreach ($motsCles as $mot) {
+                $cleanMot = trim($mot);
+                if (mb_strlen($cleanMot) > 2) {
+                    $mTerm = "%{$cleanMot}%";
+                    $q->orWhere('nom_commercial', 'LIKE', $mTerm)
+                      ->orWhere('description', 'LIKE', $mTerm)
+                      ->orWhere('composition', 'LIKE', $mTerm)
+                      ->orWhere('principes_actifs', 'LIKE', $mTerm);
+                }
+            }
+        });
+
+        $produits = $query->limit(16)->get();
+
+        return response()->json([
+            'status' => 'success',
+            'query' => $queryText,
+            'conseil_ia' => $aiResult['conseil_agronome'] ?? null,
+            'mots_cles' => $motsCles,
+            'total' => $produits->count(),
+            'data' => $produits
         ]);
     }
 }

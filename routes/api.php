@@ -48,6 +48,7 @@ Route::post('/track-visite', [ClientVisiteController::class, 'store']);
 Route::get('/home', [HomeController::class, 'index']);
 
 // --- Catalogue Produits ---
+Route::post('/produits/recherche-ia', [ProduitController::class, 'rechercheIa']);
 Route::get('/produits', [ProduitController::class, 'index']);
 Route::get('/produits/{slug}', [ProduitController::class, 'show']);
 
