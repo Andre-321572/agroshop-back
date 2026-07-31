@@ -52,4 +52,16 @@ class Gestionnaire extends Authenticatable
     {
         return $this->boutiques->pluck('id')->toArray();
     }
+
+    /**
+     * ID de la première boutique gérée (ou 1 par défaut)
+     */
+    public function getBoutiqueIdAttribute()
+    {
+        if (isset($this->attributes['boutique_id']) && $this->attributes['boutique_id']) {
+            return $this->attributes['boutique_id'];
+        }
+        $b = $this->boutiques->first();
+        return $b ? $b->id : 1;
+    }
 }

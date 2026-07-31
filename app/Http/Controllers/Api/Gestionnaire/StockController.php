@@ -13,12 +13,20 @@ class StockController extends Controller
     public function index()
     {
         $gestionnaire = Auth::user();
-        
-        $stocks = BoutiqueProduit::where('boutique_id', $gestionnaire->boutique_id)
+        $boutiqueId = $gestionnaire->boutique_id ?? 1;
+
+        $stocks = BoutiqueProduit::where('boutique_id', $boutiqueId)
                     ->with('produit')
-                    ->get();
-                    
-        return response()->json($stocks);
+                    ->get()
+                    ->map(function ($bp) {
+                        $bp->quantite_en_stock = $bp->stock_disponible;
+                        return $bp;
+                    });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $stocks
+        ]);
     }
 
     public function ajuster(Request $request, $produit_id)
