@@ -18,8 +18,9 @@ class VenteController extends Controller
 
         $validated = $request->validate([
             'nom_client' => 'required|string',
-            'prenom_client' => 'required|string',
-            'telephone' => 'required|string',
+            'prenom_client' => 'nullable|string',
+            'telephone' => 'nullable|string',
+            'telephone_client' => 'nullable|string',
             'articles' => 'required|array|min:1',
             'articles.*.produit_id' => 'required|exists:produits,id',
             'articles.*.quantite' => 'required|integer|min:1',
@@ -33,10 +34,11 @@ class VenteController extends Controller
 
             // Création de la commande liée à cette boutique
             $commande = Commande::create([
-                'code_reference' => 'B' . $gestionnaire->boutique_id . '-' . strtoupper(uniqid()),
+                'code_reference' => 'B' . ($gestionnaire->boutique_id ?? '0') . '-' . strtoupper(substr(uniqid(), -6)),
                 'nom_client' => $validated['nom_client'],
-                'prenom_client' => $validated['prenom_client'],
-                'telephone' => $validated['telephone'],
+                'prenom_client' => $validated['prenom_client'] ?? '',
+                'telephone' => $validated['telephone'] ?? $validated['telephone_client'] ?? '',
+                'telephone_client' => $validated['telephone'] ?? $validated['telephone_client'] ?? '',
                 'boutique_id' => $gestionnaire->boutique_id,
                 'statut_commande' => 'livree', // Vente directe en boutique = livrée
                 'statut_paiement' => 'paye', // Vente directe = payé
@@ -72,11 +74,17 @@ class VenteController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'Vente enregistrée avec succès', 'commande' => $commande], 201);
+            $commandeChargee = $commande->fresh()->load(['articles.produit', 'boutique']);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Vente enregistrée avec succès',
+                'commande' => $commandeChargee
+            ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Erreur lors de la vente', 'error' => $e->getMessage()], 400);
+            return response()->json(['status' => 'error', 'message' => 'Erreur lors de la vente', 'error' => $e->getMessage()], 400);
         }
     }
 }
