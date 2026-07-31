@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\AdministrateurController as AdminAdministrateurCo
 use App\Http\Controllers\Admin\ParametreSystemeController as AdminParametreSystemeController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Admin\VisiteController as AdminVisiteController;
+use App\Http\Controllers\Admin\PartenaireController as AdminPartenaireController;
 
 // --- Controllers Client / Public ---
 use App\Http\Controllers\Client\HomeController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\Client\BlogController;
 use App\Http\Controllers\Client\ContactController;
 use App\Http\Controllers\Client\ParametreController;
 use App\Http\Controllers\Client\FaqController;
+use App\Http\Controllers\Client\PartenaireController as ClientPartenaireController;
 use App\Http\Controllers\Client\VisiteController as ClientVisiteController;
 
 /*
@@ -72,6 +74,9 @@ Route::get('/parametres', [ParametreController::class, 'index']);
 
 // --- FAQ ---
 Route::get('/faq', [FaqController::class, 'index']);
+
+// --- Partenaires ---
+Route::get('/partenaires', [ClientPartenaireController::class, 'index']);
 
 // --- IA publique : recommandations produits (sans auth, optimisé pour panier / fiche produit)
 Route::post('/ai/produits/recommandations', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'produitsRecommandes']);
@@ -131,6 +136,9 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     // Administrateurs
     Route::apiResource('administrateurs', AdminAdministrateurController::class);
     Route::post('/administrateurs/{id}/reset-password', [AdminAdministrateurController::class, 'resetPassword']);
+
+    // Partenaires
+    Route::apiResource('partenaires', AdminPartenaireController::class);
 
     // Paramètres Système
     Route::get('/parametres', [AdminParametreSystemeController::class, 'index']);
