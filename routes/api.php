@@ -104,6 +104,8 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::get('/visites/ip-details', [AdminVisiteController::class, 'ipDetails']);
 
     // Produits
+    Route::get('/produits/{id}/boutiques', [AdminProduitController::class, 'getBoutiques']);
+    Route::post('/produits/{id}/affecter-boutiques', [AdminProduitController::class, 'affecterBoutiques']);
     Route::apiResource('produits', AdminProduitController::class);
     Route::post('/produits/{id}/toggle-featured', [AdminProduitController::class, 'toggleFeatured']);
     Route::delete('/produits/{produitId}/images/{imageId}', [AdminProduitController::class, 'deleteImage']);

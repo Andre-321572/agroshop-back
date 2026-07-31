@@ -370,4 +370,79 @@ class ProduitController extends Controller
             'message' => 'Produit désactivé avec succès.',
         ]);
     }
+
+    /**
+     * GET /api/admin/produits/{id}/boutiques
+     * Récupérer la liste des boutiques avec le stock affecté pour ce produit.
+     */
+    public function getBoutiques(int $id): JsonResponse
+    {
+        $produit = Produit::findOrFail($id);
+        $boutiques = DB::table('boutiques')
+            ->where('statut', 'actif')
+            ->get();
+
+        $existingPivot = DB::table('boutique_produit')
+            ->where('produit_id', $id)
+            ->get()
+            ->keyBy('boutique_id');
+
+        $data = $boutiques->map(function ($b) use ($existingPivot) {
+            $pivot = $existingPivot->get($b->id);
+            return [
+                'id' => $b->id,
+                'nom' => $b->nom,
+                'adresse' => $b->adresse,
+                'stock_disponible' => $pivot ? (int) $pivot->stock_disponible : 0,
+                'stock_alerte' => $pivot ? (int) $pivot->stock_alerte : 10,
+                'affecte' => $pivot !== null,
+            ];
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'produit' => ['id' => $produit->id, 'nom_commercial' => $produit->nom_commercial],
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * POST /api/admin/produits/{id}/affecter-boutiques
+     * Affecter un produit à une ou plusieurs boutiques avec stock et alerte.
+     */
+    public function affecterBoutiques(Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'boutiques' => 'required|array|min:1',
+            'boutiques.*.boutique_id' => 'required|exists:boutiques,id',
+            'boutiques.*.stock_disponible' => 'required|integer|min:0',
+            'boutiques.*.stock_alerte' => 'nullable|integer|min:0',
+        ]);
+
+        $produit = Produit::findOrFail($id);
+        $count = 0;
+
+        foreach ($request->boutiques as $item) {
+            $boutiqueId = $item['boutique_id'];
+            $stock = (int) $item['stock_disponible'];
+            $alerte = isset($item['stock_alerte']) ? (int) $item['stock_alerte'] : 10;
+
+            DB::table('boutique_produit')->updateOrInsert(
+                ['boutique_id' => $boutiqueId, 'produit_id' => $id],
+                [
+                    'stock_disponible' => $stock,
+                    'stock_alerte' => $alerte,
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+            $count++;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "Produit affecté à {$count} boutique(s) avec succès !",
+            'data' => $produit,
+        ]);
+    }
 }
