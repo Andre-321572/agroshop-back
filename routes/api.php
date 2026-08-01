@@ -76,8 +76,13 @@ Route::get('/parametres', [ParametreController::class, 'index']);
 // --- FAQ ---
 Route::get('/faq', [FaqController::class, 'index']);
 
-// --- Partenaires ---
-Route::get('/partenaires', [ClientPartenaireController::class, 'index']);
+// --- Boutiques Publiques (pour panier & checkout client) ---
+Route::get('/boutiques-publiques', function() {
+    $boutiques = \App\Models\Boutique::select('id', 'nom', 'type', 'adresse', 'telephone', 'localisation')
+        ->orderBy('nom')
+        ->get();
+    return response()->json(['data' => $boutiques]);
+});
 
 // --- IA publique : recommandations produits (sans auth, optimisé pour panier / fiche produit)
 Route::post('/ai/produits/recommandations', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'produitsRecommandes']);
