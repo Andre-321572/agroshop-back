@@ -120,7 +120,7 @@ class CommandeController extends Controller
                 'montant_ttc' => $montantTtc,
                 'frais_livraison' => $fraisLivraison,
                 'montant_total' => $montantTotal,
-                'type_livraison' => $request->mode_livraison ?? $request->type_livraison ?? 'retrait_agence',
+                'type_livraison' => $typeLivraison,
                 'adresse_livraison' => $request->adresse_livraison ?? $request->adresse_ligne1 ?? 'Retrait en agence',
                 'date_livraison_souhaitee' => $request->date_livraison_souhaitee,
                 'instructions_livraison' => $request->instructions_livraison,
