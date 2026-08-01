@@ -123,4 +123,23 @@ class VenteController extends Controller
             ], 400);
         }
     }
+
+    public function genererRecuPdf($id)
+    {
+        $relations = ['articles.produit'];
+        if (Schema::hasColumn('commandes', 'boutique_id')) {
+            $relations[] = 'boutique';
+        }
+
+        $commande = Commande::with($relations)->findOrFail($id);
+
+        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.recu_ticket', compact('commande'))
+                ->setPaper([0, 0, 226.77, 600], 'portrait');
+            
+            return $pdf->stream("recu_{$commande->code_reference}.pdf");
+        }
+
+        return response()->json(['message' => 'DomPDF non installé'], 500);
+    }
 }

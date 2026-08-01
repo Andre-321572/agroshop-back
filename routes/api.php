@@ -61,6 +61,7 @@ Route::get('/categories/{slug}', [CategorieController::class, 'show']);
 // --- Commandes & Suivi Public ---
 Route::post('/commandes', [CommandeController::class, 'store']);
 Route::get('/commandes/suivi/{reference}', [CommandeController::class, 'suivi']);
+Route::get('/commandes/{id}/recu-pdf', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'genererRecuPdf']);
 
 // --- Blog Public ---
 Route::get('/blog', [BlogController::class, 'index']);
@@ -190,6 +191,7 @@ Route::prefix('gestionnaire')->middleware('auth:gestionnaire')->group(function (
     Route::post('/stock/ajuster/{produit_id}', [\App\Http\Controllers\Api\Gestionnaire\StockController::class, 'ajuster']);
 
     Route::post('/ventes', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'store']);
+    Route::get('/commandes/{id}/recu-pdf', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'genererRecuPdf']);
 
     Route::post('/rapports/generer', [\App\Http\Controllers\Api\Gestionnaire\RapportController::class, 'genererEtEnvoyer']);
 
