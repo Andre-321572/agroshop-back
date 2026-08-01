@@ -108,12 +108,12 @@ class CommandeController extends Controller
                 'code_reference' => $codeReference,
                 'nom_client' => $request->nom_client ?? $request->nom ?? 'Client',
                 'prenom_client' => $request->prenom_client ?? $request->prenom ?? '',
-                'telephone' => $request->telephone,
-                'email' => $request->email,
-                'adresse_ligne1' => $request->adresse_ligne1,
-                'adresse_ligne2' => $request->adresse_ligne2,
-                'ville' => $request->ville,
-                'code_postal' => $request->code_postal,
+                'telephone' => $request->telephone ?? '00000000',
+                'email' => $request->email ?? 'client@agroshop.tg',
+                'adresse_ligne1' => $request->adresse_ligne1 ?? 'Lomé, Togo',
+                'adresse_ligne2' => $request->adresse_ligne2 ?? '',
+                'ville' => $request->ville ?? 'Lomé',
+                'code_postal' => $request->code_postal ?? '00228',
                 'pays' => $request->input('pays', 'Togo'),
                 'montant_ht' => $montantHt,
                 'montant_tva' => $montantTva,
@@ -121,7 +121,7 @@ class CommandeController extends Controller
                 'frais_livraison' => $fraisLivraison,
                 'montant_total' => $montantTotal,
                 'type_livraison' => $request->mode_livraison ?? $request->type_livraison ?? 'retrait_agence',
-                'adresse_livraison' => $request->adresse_livraison ?? $request->adresse_ligne1,
+                'adresse_livraison' => $request->adresse_livraison ?? $request->adresse_ligne1 ?? 'Retrait en agence',
                 'date_livraison_souhaitee' => $request->date_livraison_souhaitee,
                 'instructions_livraison' => $request->instructions_livraison,
                 'statut_commande' => 'en_attente',
@@ -132,7 +132,8 @@ class CommandeController extends Controller
             ];
 
             if ($hasBoutiqueId) {
-                $commandeData['boutique_id'] = $request->input('boutique_id', 1);
+                $rawBoutiqueId = $request->input('boutique_id') ?? $request->input('boutique') ?? 1;
+                $commandeData['boutique_id'] = (int) $rawBoutiqueId;
             }
 
             $commande = Commande::create($commandeData);
@@ -140,17 +141,26 @@ class CommandeController extends Controller
             // 5. Création des articles de la commande
             foreach ($articlesAInserer as $articleData) {
                 $articleData['commande_id'] = $commande->id;
+                if (empty($articleData['nom_produit'])) {
+                    $articleData['nom_produit'] = 'Article AgroShop';
+                }
                 CommandeArticle::create($articleData);
             }
 
-            // 6. Historique initial de suivi
-            CommandeSuivi::create([
-                'commande_id' => $commande->id,
-                'statut_precedent' => null,
-                'nouveau_statut' => 'en_attente',
-                'commentaire' => 'Commande créée par le client',
-                'utilisateur_id' => null,
-            ]);
+            // 6. Historique initial de suivi (non-bloquant)
+            try {
+                if (Schema::hasTable('commande_suivis')) {
+                    CommandeSuivi::create([
+                        'commande_id' => $commande->id,
+                        'statut_precedent' => null,
+                        'nouveau_statut' => 'en_attente',
+                        'commentaire' => 'Commande créée par le client',
+                        'utilisateur_id' => null,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                // non-bloquant
+            }
 
             DB::commit();
 
