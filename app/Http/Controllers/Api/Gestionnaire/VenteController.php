@@ -84,11 +84,15 @@ class VenteController extends Controller
                 $stock->stock_disponible = max(0, $curStock - $item['quantite']);
                 $stock->save();
 
+                $produit = \App\Models\Produit::find($item['produit_id']);
+                $nomProduit = $produit ? ($produit->nom_commercial ?? $produit->nom ?? ('Produit #' . $item['produit_id'])) : ('Produit #' . $item['produit_id']);
+
                 $montant_ligne = $item['quantite'] * $item['prix_unitaire'];
 
                 CommandeArticle::create([
                     'commande_id' => $commande->id,
                     'produit_id' => $item['produit_id'],
+                    'nom_produit' => $nomProduit,
                     'quantite' => $item['quantite'],
                     'prix_unitaire' => $item['prix_unitaire'],
                     'montant_ligne' => $montant_ligne,
