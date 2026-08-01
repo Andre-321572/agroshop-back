@@ -294,10 +294,17 @@ class BoutiqueController extends Controller
             $quantiteVendue = (int) ($ventesStats->quantite_vendue ?? 0);
             $chiffreAffaires = (float) ($ventesStats->total_ca ?? 0);
 
+            $catName = 'Général';
+            if ($produit->categorie) {
+                $catName = $produit->categorie->nom;
+            } elseif ($produit->categories && $produit->categories->first()) {
+                $catName = $produit->categories->first()->nom;
+            }
+
             return [
                 'produit_id'      => $produit->id,
                 'nom_commercial'  => $produit->nom_commercial,
-                'categorie_nom'   => $produit->categorie ? $produit->categorie->nom : 'Général',
+                'categorie_nom'   => $catName,
                 'prix_unitaire'   => (float) $produit->prix_unitaire,
                 'unite_mesure'    => $produit->unite_mesure,
                 'stock_restant'   => (int) $pivot->stock_disponible,
