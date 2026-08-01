@@ -37,6 +37,7 @@ class Commande extends Model
         'commentaire',
         'ip_client',
         'user_agent',
+        'boutique_id',
     ];
 
     protected $casts = [

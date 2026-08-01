@@ -9,12 +9,14 @@ use App\Models\CommandeArticle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class VenteController extends Controller
 {
     public function store(Request $request)
     {
         $gestionnaire = Auth::user();
+        $boutiqueId = $gestionnaire->boutique_id ?? 1;
 
         $validated = $request->validate([
             'nom_client' => 'required|string',
@@ -31,23 +33,27 @@ class VenteController extends Controller
             DB::beginTransaction();
 
             $montant_total = 0;
+            $hasBoutiqueId = Schema::hasColumn('commandes', 'boutique_id');
 
-            // Création de la commande liée à cette boutique
-            $commande = Commande::create([
-                'code_reference' => 'B' . ($gestionnaire->boutique_id ?? '0') . '-' . strtoupper(substr(uniqid(), -6)),
+            $commandeData = [
+                'code_reference' => 'B' . $boutiqueId . '-' . strtoupper(substr(uniqid(), -6)),
                 'nom_client' => $validated['nom_client'],
                 'prenom_client' => $validated['prenom_client'] ?? '',
                 'telephone' => $validated['telephone'] ?? $validated['telephone_client'] ?? '',
-                'telephone_client' => $validated['telephone'] ?? $validated['telephone_client'] ?? '',
-                'boutique_id' => $gestionnaire->boutique_id,
                 'statut_commande' => 'livree', // Vente directe en boutique = livrée
                 'statut_paiement' => 'paye', // Vente directe = payé
                 'type_livraison' => 'retrait_agence',
-            ]);
+            ];
+
+            if ($hasBoutiqueId) {
+                $commandeData['boutique_id'] = $boutiqueId;
+            }
+
+            $commande = Commande::create($commandeData);
 
             foreach ($validated['articles'] as $item) {
                 // Vérifier et déduire le stock
-                $stock = BoutiqueProduit::where('boutique_id', $gestionnaire->boutique_id)
+                $stock = BoutiqueProduit::where('boutique_id', $boutiqueId)
                                         ->where('produit_id', $item['produit_id'])
                                         ->first();
 
@@ -74,7 +80,12 @@ class VenteController extends Controller
 
             DB::commit();
 
-            $commandeChargee = $commande->fresh()->load(['articles.produit', 'boutique']);
+            $relations = ['articles.produit'];
+            if ($hasBoutiqueId) {
+                $relations[] = 'boutique';
+            }
+
+            $commandeChargee = $commande->fresh()->load($relations);
 
             return response()->json([
                 'status' => 'success',

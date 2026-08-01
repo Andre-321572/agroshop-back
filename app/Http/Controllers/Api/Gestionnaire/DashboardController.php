@@ -3,35 +3,57 @@
 namespace App\Http\Controllers\Api\Gestionnaire;
 
 use App\Http\Controllers\Controller;
+use App\Models\BoutiqueProduit;
 use App\Models\Commande;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
     public function stats()
     {
         $gestionnaire = Auth::user();
+        $boutiqueId = $gestionnaire->boutique_id ?? 1;
+        $hasBoutiqueId = Schema::hasColumn('commandes', 'boutique_id');
 
-        // Chiffre d'affaires de SA boutique (toutes les ventes validées)
-        $chiffreAffaires = Commande::where('boutique_id', $gestionnaire->boutique_id)
-                                   ->where('statut_commande', '!=', 'annulee')
-                                   ->sum('montant_total');
+        $chiffreAffaires = 0;
+        $ventesAujourdhui = 0;
+        $caAujourdhui = 0;
 
-        // Nombre de ventes aujourd'hui
-        $ventesAujourdhui = Commande::where('boutique_id', $gestionnaire->boutique_id)
-                                    ->whereDate('created_at', today())
-                                    ->count();
-                                    
-        $caAujourdhui = Commande::where('boutique_id', $gestionnaire->boutique_id)
-                                ->whereDate('created_at', today())
-                                ->where('statut_commande', '!=', 'annulee')
-                                ->sum('montant_total');
+        if ($hasBoutiqueId) {
+            try {
+                $chiffreAffaires = (float) Commande::where('boutique_id', $boutiqueId)
+                    ->where('statut_commande', '!=', 'annulee')
+                    ->sum('montant_total');
+
+                $ventesAujourdhui = (int) Commande::where('boutique_id', $boutiqueId)
+                    ->whereDate('created_at', today())
+                    ->count();
+
+                $caAujourdhui = (float) Commande::where('boutique_id', $boutiqueId)
+                    ->whereDate('created_at', today())
+                    ->where('statut_commande', '!=', 'annulee')
+                    ->sum('montant_total');
+            } catch (\Throwable $e) {
+                // Ignorer si divergence de colonne
+            }
+        }
+
+        $produitsEnStock = (int) BoutiqueProduit::where('boutique_id', $boutiqueId)->count();
 
         return response()->json([
+            'status' => 'success',
+            'data' => [
+                'chiffre_affaires_total' => $chiffreAffaires,
+                'ventes_du_jour'         => $ventesAujourdhui,
+                'ca_du_jour'             => $caAujourdhui,
+                'produits_en_stock'      => $produitsEnStock,
+            ],
+            'ca_du_jour'             => $caAujourdhui,
+            'ventes_du_jour'         => $ventesAujourdhui,
+            'produits_en_stock'      => $produitsEnStock,
             'chiffre_affaires_total' => $chiffreAffaires,
-            'ventes_aujourdhui' => $ventesAujourdhui,
-            'ca_aujourdhui' => $caAujourdhui,
         ]);
     }
 }
