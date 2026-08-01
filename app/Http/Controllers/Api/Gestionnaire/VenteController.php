@@ -16,13 +16,20 @@ class VenteController extends Controller
     public function index(Request $request)
     {
         $gestionnaire = Auth::user();
-        $boutiqueId = $gestionnaire->boutique_id ?? $gestionnaire->boutiques()->first()?->id ?? 1;
+        $boutiqueId = $request->header('X-Boutique-Id')
+            ?? $request->query('boutique_id')
+            ?? $gestionnaire->boutique_id
+            ?? $gestionnaire->boutiques()->first()?->id;
+
         $hasBoutiqueId = Schema::hasColumn('commandes', 'boutique_id');
 
         $query = Commande::with(['articles.produit', 'boutique']);
 
-        if ($hasBoutiqueId) {
-            $query->where('boutique_id', $boutiqueId);
+        if ($hasBoutiqueId && $boutiqueId) {
+            $query->where(function ($q) use ($boutiqueId) {
+                $q->where('boutique_id', $boutiqueId)
+                  ->orWhereNull('boutique_id');
+            });
         }
 
         if ($request->filled('search')) {

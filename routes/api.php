@@ -186,7 +186,7 @@ Route::prefix('gestionnaire')->group(function () {
 });
 
 // --- Actions Gestionnaire Protégées ---
-Route::prefix('gestionnaire')->middleware('auth:gestionnaire')->group(function () {
+Route::prefix('gestionnaire')->middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Api\Gestionnaire\AuthController::class, 'logout']);
     Route::get('/me',     [\App\Http\Controllers\Api\Gestionnaire\AuthController::class, 'me']);
 
