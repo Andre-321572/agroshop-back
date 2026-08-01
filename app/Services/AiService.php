@@ -19,7 +19,7 @@ class AiService
     public function __construct()
     {
         $this->apiKey = config('services.groq.api_key', env('GROQ_API_KEY', ''));
-        $this->defaultModel = config('services.groq.model', env('GROQ_MODEL', 'llama-3.1-70b-versatile'));
+        $this->defaultModel = config('services.groq.model', env('GROQ_MODEL', 'llama-3.3-70b-versatile'));
     }
 
     /**

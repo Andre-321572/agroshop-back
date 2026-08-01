@@ -16,7 +16,7 @@ class VenteController extends Controller
     public function store(Request $request)
     {
         $gestionnaire = Auth::user();
-        $boutiqueId = $gestionnaire->boutique_id ?? 1;
+        $boutiqueId = $gestionnaire->boutique_id ?? $gestionnaire->boutiques()->first()?->id ?? 1;
 
         $validated = $request->validate([
             'nom_client' => 'required|string',
@@ -57,11 +57,17 @@ class VenteController extends Controller
                                         ->where('produit_id', $item['produit_id'])
                                         ->first();
 
-                if (!$stock || $stock->stock_disponible < $item['quantite']) {
-                    throw new \Exception("Stock insuffisant pour le produit ID: {$item['produit_id']}");
+                if (!$stock) {
+                    $stock = BoutiqueProduit::create([
+                        'boutique_id' => $boutiqueId,
+                        'produit_id' => $item['produit_id'],
+                        'stock_disponible' => 0,
+                        'stock_alerte' => 10,
+                    ]);
                 }
 
-                $stock->stock_disponible -= $item['quantite'];
+                $curStock = (int) ($stock->stock_disponible ?? 0);
+                $stock->stock_disponible = max(0, $curStock - $item['quantite']);
                 $stock->save();
 
                 $montant_ligne = $item['quantite'] * $item['prix_unitaire'];
