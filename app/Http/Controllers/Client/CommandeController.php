@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Schema;
 
 class CommandeController extends Controller
 {

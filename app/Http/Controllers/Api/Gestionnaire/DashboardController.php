@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Gestionnaire;
 use App\Http\Controllers\Controller;
 use App\Models\BoutiqueProduit;
 use App\Models\Commande;
+use App\Models\Gestionnaire;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -13,8 +14,9 @@ class DashboardController extends Controller
 {
     public function stats()
     {
+        /** @var Gestionnaire|null $gestionnaire */
         $gestionnaire = Auth::user();
-        $boutiqueId = $gestionnaire->boutique_id ?? $gestionnaire->boutiques()->first()?->id ?? 1;
+        $boutiqueId = $gestionnaire?->boutique_id ?? 1;
         $hasBoutiqueId = Schema::hasColumn('commandes', 'boutique_id');
 
         $chiffreAffaires = 0;

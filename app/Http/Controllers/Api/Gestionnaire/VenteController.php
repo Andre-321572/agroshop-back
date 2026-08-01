@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\BoutiqueProduit;
 use App\Models\Commande;
 use App\Models\CommandeArticle;
+use App\Models\Gestionnaire;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,11 +17,11 @@ class VenteController extends Controller
 {
     public function index(Request $request)
     {
+        /** @var Gestionnaire|null $gestionnaire */
         $gestionnaire = Auth::user();
         $boutiqueId = $request->header('X-Boutique-Id')
             ?? $request->query('boutique_id')
-            ?? $gestionnaire->boutique_id
-            ?? $gestionnaire->boutiques()->first()?->id;
+            ?? $gestionnaire?->boutique_id;
 
         $hasBoutiqueId = Schema::hasColumn('commandes', 'boutique_id');
 
@@ -184,8 +186,8 @@ class VenteController extends Controller
         $commande = Commande::with($relations)->findOrFail($id);
         $html = view('pdf.recu_ticket', compact('commande'))->render();
 
-        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
-            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html)
+        if (class_exists(Pdf::class)) {
+            $pdf = Pdf::loadHTML($html)
                 ->setPaper([0, 0, 226.77, 600], 'portrait');
             return $pdf->stream("recu_{$commande->code_reference}.pdf");
         }
