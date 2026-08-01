@@ -266,4 +266,95 @@ class BoutiqueController extends Controller
             'created_at'   => $b->created_at,
         ];
     }
+
+    /**
+     * Obtenir le rapport détaillé des stocks et ventes pour une boutique
+     */
+    public function getRapportBoutique($id)
+    {
+        $boutique = Boutique::findOrFail($id);
+
+        // 1. Produits affectés avec stock disponible et total vendu
+        $pivots = DB::table('boutique_produit')
+            ->where('boutique_id', $id)
+            ->get();
+
+        $produitsStockVentes = $pivots->map(function ($pivot) use ($id) {
+            $produit = Produit::with('categorie:id,nom')->find($pivot->produit_id);
+            if (!$produit) return null;
+
+            // Calcul du total vendu de ce produit spécifiquement dans cette boutique
+            $ventesStats = DB::table('commande_articles as ca')
+                ->join('commandes as c', 'ca.commande_id', '=', 'c.id')
+                ->where('c.boutique_id', $id)
+                ->where('ca.produit_id', $pivot->produit_id)
+                ->selectRaw('COALESCE(SUM(ca.quantite), 0) as quantite_vendue, COALESCE(SUM(ca.montant_ligne), 0) as total_ca')
+                ->first();
+
+            $quantiteVendue = (int) ($ventesStats->quantite_vendue ?? 0);
+            $chiffreAffaires = (float) ($ventesStats->total_ca ?? 0);
+
+            return [
+                'produit_id'      => $produit->id,
+                'nom_commercial'  => $produit->nom_commercial,
+                'categorie_nom'   => $produit->categorie ? $produit->categorie->nom : 'Général',
+                'prix_unitaire'   => (float) $produit->prix_unitaire,
+                'unite_mesure'    => $produit->unite_mesure,
+                'stock_restant'   => (int) $pivot->stock_disponible,
+                'stock_alerte'    => (int) $pivot->stock_alerte,
+                'quantite_vendue' => $quantiteVendue,
+                'chiffre_affaires'=> $chiffreAffaires,
+            ];
+        })->filter()->values();
+
+        // 2. Commandes / Ventes récentes de la boutique
+        $commandes = DB::table('commandes')
+            ->where('boutique_id', $id)
+            ->orderByDesc('created_at')
+            ->take(50)
+            ->get()
+            ->map(function ($cmd) {
+                $articles = DB::table('commande_articles as ca')
+                    ->join('produits as p', 'ca.produit_id', '=', 'p.id')
+                    ->where('ca.commande_id', $cmd->id)
+                    ->select('p.nom_commercial', 'ca.quantite', 'ca.prix_unitaire', 'ca.montant_ligne')
+                    ->get();
+
+                return [
+                    'id'             => $cmd->id,
+                    'code_reference' => $cmd->code_reference,
+                    'nom_client'     => $cmd->nom_client . ($cmd->prenom_client ? ' ' . $cmd->prenom_client : ''),
+                    'telephone'      => $cmd->telephone ?? $cmd->telephone_client ?? '—',
+                    'statut'         => $cmd->statut_commande,
+                    'montant_total'  => (float) $cmd->montant_total,
+                    'created_at'     => $cmd->created_at,
+                    'articles'       => $articles,
+                ];
+            });
+
+        // 3. Totaux globaux
+        $totalCA = DB::table('commandes')->where('boutique_id', $id)->sum('montant_total');
+        $totalCommandes = DB::table('commandes')->where('boutique_id', $id)->count();
+        $totalArticlesVendus = DB::table('commande_articles as ca')
+            ->join('commandes as c', 'ca.commande_id', '=', 'c.id')
+            ->where('c.boutique_id', $id)
+            ->sum('ca.quantite');
+
+        return response()->json([
+            'status' => 'success',
+            'boutique' => [
+                'id'       => $boutique->id,
+                'nom'      => $boutique->nom,
+                'adresse'  => $boutique->adresse,
+            ],
+            'kpi' => [
+                'chiffre_affaires_total' => (float) $totalCA,
+                'nombre_commandes'       => (int) $totalCommandes,
+                'total_articles_vendus'  => (int) $totalArticlesVendus,
+                'valeur_stock_restant'   => (float) $produitsStockVentes->sum(fn($p) => $p['stock_restant'] * $p['prix_unitaire']),
+            ],
+            'produits'  => $produitsStockVentes,
+            'commandes' => $commandes,
+        ]);
+    }
 }

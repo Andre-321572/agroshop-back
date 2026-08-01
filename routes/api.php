@@ -149,6 +149,7 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
 
     // --- Multi-Boutiques & Délégués ---
     Route::get('/boutiques/{id}/produits-approvisionnement', [\App\Http\Controllers\Api\Admin\BoutiqueController::class, 'getProduitsApprovisionnement']);
+    Route::get('/boutiques/{id}/rapport-ventes', [\App\Http\Controllers\Api\Admin\BoutiqueController::class, 'getRapportBoutique']);
     Route::post('/boutiques/{id}/approvisionner', [\App\Http\Controllers\Api\Admin\BoutiqueController::class, 'approvisionner']);
     Route::apiResource('boutiques', \App\Http\Controllers\Api\Admin\BoutiqueController::class);
     Route::apiResource('gestionnaires', \App\Http\Controllers\Api\Admin\GestionnaireController::class);
