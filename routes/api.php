@@ -203,6 +203,7 @@ Route::prefix('gestionnaire')->middleware('auth:sanctum')->group(function () {
     Route::put('/commandes/{id}/statut', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'updateStatut']);
 
     Route::post('/rapports/generer', [\App\Http\Controllers\Api\Gestionnaire\RapportController::class, 'genererEtEnvoyer']);
+    Route::post('/rapports/sauvegarder-ia', [\App\Http\Controllers\Api\Gestionnaire\RapportController::class, 'enregistrerRapportIa']);
 
     // --- Assistant IA — endpoints Gestionnaire
     Route::post('/ai/rapports/generer', [\App\Http\Controllers\Api\Admin\AiAssistantController::class, 'genererRapport']);

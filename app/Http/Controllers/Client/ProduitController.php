@@ -106,7 +106,7 @@ class ProduitController extends Controller
 
     /**
      * POST /api/produits/recherche-ia
-     * Recherche sémantique assistée par IA avec conseil agronomique.
+     * Recherche sémantique assistée par avec conseil agronomique.
      */
     public function rechercheIa(Request $request, AiService $aiService): JsonResponse
     {
@@ -119,7 +119,7 @@ class ProduitController extends Controller
             ], 400);
         }
 
-        // 1. Mise en cache de la réponse IA pour les requêtes identiques (3 heures)
+        // 1. Mise en cache de la réponse pour les requêtes identiques (3 heures)
         $cacheKey = 'ai_search_v1_' . md5(mb_strtolower($queryText));
         $aiResult = Cache::remember($cacheKey, now()->addHours(3), function () use ($queryText, $aiService) {
             $prompt = <<<PROMPT
@@ -138,7 +138,7 @@ PROMPT;
             return $aiService->chatJson($prompt, $sys);
         });
 
-        // 2. Extraction des mots-clés IA ou repli sur les mots de la requête
+        // 2. Extraction des mots-clés ou repli sur les mots de la requête
         $motsCles = $aiResult['mots_cles'] ?? array_filter(explode(' ', $queryText), fn($w) => mb_strlen($w) > 2);
         if (empty($motsCles)) {
             $motsCles = [$queryText];

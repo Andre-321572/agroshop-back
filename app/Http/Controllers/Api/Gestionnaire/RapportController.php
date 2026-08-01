@@ -61,10 +61,17 @@ class RapportController extends Controller
         $pdfOutput = null;
         if (view()->exists('pdf.rapport_ventes')) {
             $html = view('pdf.rapport_ventes', $data)->render();
-            if (class_exists(Pdf::class)) {
-                $pdfOutput = Pdf::loadHTML($html)->output();
-            } elseif (class_exists(\Dompdf\Dompdf::class)) {
-                $dompdf = new \Dompdf\Dompdf();
+            try {
+                if (class_exists(Pdf::class)) {
+                    $pdfOutput = Pdf::loadHTML($html)->output();
+                }
+            } catch (\Throwable $e) {}
+
+            if (!$pdfOutput && class_exists(\Dompdf\Dompdf::class)) {
+                $options = new \Dompdf\Options();
+                $options->set('isHtml5ParserEnabled', true);
+                $options->set('isRemoteEnabled', true);
+                $dompdf = new \Dompdf\Dompdf($options);
                 $dompdf->loadHtml($html);
                 $dompdf->render();
                 $pdfOutput = $dompdf->output();
@@ -77,17 +84,107 @@ class RapportController extends Controller
             Storage::disk('public')->put($fileName, $pdfOutput);
         }
 
+        $gestionnaireId = $gestionnaire?->id ?? Gestionnaire::first()?->id ?? 1;
+
         $rapport = Rapport::create([
             'boutique_id' => $boutiqueId,
-            'gestionnaire_id' => $gestionnaire->id,
+            'gestionnaire_id' => $gestionnaireId,
             'type' => $validated['type'],
+            'titre' => $titre,
             'fichier_pdf' => $fileName,
             'date_rapport' => $date->toDateString(),
             'statut_lecture' => false
         ]);
 
         return response()->json([
+            'status' => 'success',
             'message' => 'Rapport généré et envoyé à l\'administrateur avec succès',
+            'rapport' => $rapport
+        ]);
+    }
+
+    public function enregistrerRapportIa(Request $request)
+    {
+        /** @var Gestionnaire|null $gestionnaire */
+        $gestionnaire = Auth::user();
+        $boutique = $gestionnaire?->boutique
+            ?? (object)['id' => 1, 'nom' => 'Boutique Principale'];
+
+        $boutiqueId = $boutique->id ?? $request->input('boutique_id', 1);
+        $boutiqueNom = $boutique->nom ?? 'Boutique Principale';
+
+        $validated = $request->validate([
+            'type' => 'nullable|string|in:journalier,hebdomadaire,mensuel,inventaire',
+            'date_rapport' => 'required|date',
+            'titre' => 'nullable|string',
+            'introduction' => 'nullable|string',
+            'section_activite' => 'nullable|string',
+            'section_stocks' => 'nullable|string',
+            'section_anomalies' => 'nullable|string',
+            'section_recommandations' => 'nullable|string',
+            'conclusion' => 'nullable|string',
+        ]);
+
+        $type = $validated['type'] ?? 'journalier';
+        $typeFormate = in_array($type, ['journalier', 'mensuel']) ? $type : 'journalier';
+        $date = Carbon::parse($validated['date_rapport']);
+        $titre = $validated['titre'] ?? "Rapport IA {$type} - " . $date->format('d/m/Y');
+
+        $data = [
+            'titre' => $titre,
+            'boutique' => $boutiqueNom,
+            'gestionnaire' => ($gestionnaire?->prenom ?? 'Gestionnaire') . ' ' . ($gestionnaire?->nom ?? ''),
+            'date_generation' => now()->format('d/m/Y H:i'),
+            'date_rapport' => $date->format('d/m/Y'),
+            'introduction' => $validated['introduction'] ?? '',
+            'section_activite' => $validated['section_activite'] ?? '',
+            'section_stocks' => $validated['section_stocks'] ?? '',
+            'section_anomalies' => $validated['section_anomalies'] ?? '',
+            'section_recommandations' => $validated['section_recommandations'] ?? '',
+            'conclusion' => $validated['conclusion'] ?? '',
+        ];
+
+        $pdfOutput = null;
+        if (view()->exists('pdf.rapport_ia')) {
+            $html = view('pdf.rapport_ia', $data)->render();
+            try {
+                if (class_exists(Pdf::class)) {
+                    $pdfOutput = Pdf::loadHTML($html)->output();
+                }
+            } catch (\Throwable $e) {}
+
+            if (!$pdfOutput && class_exists(\Dompdf\Dompdf::class)) {
+                $options = new \Dompdf\Options();
+                $options->set('isHtml5ParserEnabled', true);
+                $options->set('isRemoteEnabled', true);
+                $dompdf = new \Dompdf\Dompdf($options);
+                $dompdf->loadHtml($html);
+                $dompdf->render();
+                $pdfOutput = $dompdf->output();
+            }
+        }
+
+        $fileName = 'rapports/ia_' . $boutiqueId . '_' . $typeFormate . '_' . $date->format('Y_m_d_His') . '.pdf';
+
+        if ($pdfOutput) {
+            Storage::disk('public')->put($fileName, $pdfOutput);
+        }
+
+        $gestionnaireId = $gestionnaire?->id ?? Gestionnaire::first()?->id ?? 1;
+
+        $rapport = Rapport::create([
+            'boutique_id' => $boutiqueId,
+            'gestionnaire_id' => $gestionnaireId,
+            'type' => $typeFormate,
+            'titre' => $titre,
+            'fichier_pdf' => $fileName,
+            'date_rapport' => $date->toDateString(),
+            'statut_lecture' => false
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Rapport IA transmis à l\'administrateur avec succès !',
             'rapport' => $rapport
         ]);
     }

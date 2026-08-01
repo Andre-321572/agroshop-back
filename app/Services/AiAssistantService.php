@@ -50,6 +50,6 @@ class AiAssistantService
             return $reponse;
         }
 
-        return "Je suis l'assistant IA d'Agroshop. Pour l'instant, je peux répondre aux questions sur les 'stocks de ciment' ou les produits en 'rupture'. L'intégration complète avec Gemini est en cours !";
+        return "Je suis l'assistant d'Agroshop. Pour l'instant, je peux répondre aux questions sur les 'stocks de ciment' ou les produits en 'rupture'. L'intégration complète avec Gemini est en cours !";
     }
 }

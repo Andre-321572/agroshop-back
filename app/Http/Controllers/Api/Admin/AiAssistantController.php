@@ -38,18 +38,18 @@ class AiAssistantController extends Controller
 
         $result = $this->ai->chat(
             $validated['prompt'],
-            $validated['system'] ?? 'Tu es un assistant IA expert en agriculture et commerce agricole au Togo. Réponds en français.'
+            $validated['system'] ?? 'Tu es un assistant expert en agriculture et commerce agricole au Togo. Réponds en français.'
         );
 
         return response()->json([
             'status' => $result !== null ? 'success' : 'error',
-            'message' => $result !== null ? 'Réponse IA générée.' : 'Service IA indisponible (clé API manquante ou erreur réseau).',
+            'message' => $result !== null ? 'Réponse générée.' : 'Service indisponible (clé API manquante ou erreur réseau).',
             'data' => ['content' => $result ?? '']
         ]);
     }
 
     // =================================================================
-    // FEATURE 1 — Génération IA d'une fiche produit agricole
+    // FEATURE 1 — Génération d'une fiche produit agricole
     // POST /admin/ai/produits/generer-fiche
     // =================================================================
     public function genererFicheProduit(Request $request): JsonResponse
@@ -133,7 +133,7 @@ PROMPT;
     {
         return response()->json([
             'status' => 'success',
-            'message' => 'Service IA temporairement indisponible — retour à un modèle de base (prêt à l\'emploi).',
+            'message' => 'Service temporairement indisponible — retour à un modèle de base (prêt à l\'emploi).',
             'ai_enabled' => false,
             'data' => [
                 'description' => "{$nom} est un produit agricole de qualité, adapté aux conditions agro-écologiques du Togo. Idéal pour les cultures de céréales (maïs, riz, sorgho) et le maraîchage (tomate, piment, oignon). Commercialisé par AgroShop avec certification de qualité.",
@@ -357,7 +357,7 @@ PROMPT;
     }
 
     // =================================================================
-    // FEATURE 6 — Génération IA de Rapport gestionnaire
+    // FEATURE 6 — Génération de Rapport gestionnaire
     // POST /admin/ai/rapports/generer
     // =================================================================
     public function genererRapport(Request $request): JsonResponse
@@ -520,7 +520,7 @@ PROMPT;
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Insights IA dashboard générés.',
+            'message' => 'Insights dashboard générés.',
             'data' => [
                 'ca_30j_fcfa' => (int)$ca30,
                 'ca_prevu_30j_fcfa' => $caPrev30,
@@ -536,7 +536,7 @@ PROMPT;
     }
 
     // =================================================================
-    // FEATURE 3 — Rédaction IA d'un Article de Blog agricole
+    // FEATURE 3 — Rédaction d'un Article de Blog agricole
     // POST /admin/ai/blog/generer-article
     // =================================================================
     public function genererArticleBlog(Request $request): JsonResponse
