@@ -132,14 +132,25 @@ class VenteController extends Controller
         }
 
         $commande = Commande::with($relations)->findOrFail($id);
+        $html = view('pdf.recu_ticket', compact('commande'))->render();
 
         if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
-            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.recu_ticket', compact('commande'))
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html)
                 ->setPaper([0, 0, 226.77, 600], 'portrait');
-            
             return $pdf->stream("recu_{$commande->code_reference}.pdf");
         }
 
-        return response()->json(['message' => 'DomPDF non installé'], 500);
+        if (class_exists(\Dompdf\Dompdf::class)) {
+            $dompdf = new \Dompdf\Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper([0, 0, 226.77, 600], 'portrait');
+            $dompdf->render();
+            return response($dompdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="recu_' . $commande->code_reference . '.pdf"'
+            ]);
+        }
+
+        return response()->json(['message' => 'Bibliothèque Dompdf non disponible'], 500);
     }
 }
