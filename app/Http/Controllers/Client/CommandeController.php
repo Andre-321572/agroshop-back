@@ -94,10 +94,12 @@ class CommandeController extends Controller
             $codeReference = 'AGR' . date('Y') . str_pad((string) $nextId, 6, '0', STR_PAD_LEFT);
 
             // 4. Création de la commande
-            $commande = Commande::create([
+            $hasBoutiqueId = Schema::hasColumn('commandes', 'boutique_id');
+
+            $commandeData = [
                 'code_reference' => $codeReference,
-                'nom_client' => $request->nom,
-                'prenom_client' => $request->prenom,
+                'nom_client' => $request->nom_client ?? $request->nom ?? 'Client',
+                'prenom_client' => $request->prenom_client ?? $request->prenom ?? '',
                 'telephone' => $request->telephone,
                 'email' => $request->email,
                 'adresse_ligne1' => $request->adresse_ligne1,
@@ -110,8 +112,8 @@ class CommandeController extends Controller
                 'montant_ttc' => $montantTtc,
                 'frais_livraison' => $fraisLivraison,
                 'montant_total' => $montantTotal,
-                'type_livraison' => $request->type_livraison,
-                'adresse_livraison' => $request->adresse_livraison,
+                'type_livraison' => $request->mode_livraison ?? $request->type_livraison ?? 'retrait_agence',
+                'adresse_livraison' => $request->adresse_livraison ?? $request->adresse_ligne1,
                 'date_livraison_souhaitee' => $request->date_livraison_souhaitee,
                 'instructions_livraison' => $request->instructions_livraison,
                 'statut_commande' => 'en_attente',
@@ -119,7 +121,13 @@ class CommandeController extends Controller
                 'commentaire' => $request->commentaire,
                 'ip_client' => $request->ip(),
                 'user_agent' => $request->userAgent(),
-            ]);
+            ];
+
+            if ($hasBoutiqueId) {
+                $commandeData['boutique_id'] = $request->input('boutique_id', 1);
+            }
+
+            $commande = Commande::create($commandeData);
 
             // 5. Création des articles de la commande
             foreach ($articlesAInserer as $articleData) {

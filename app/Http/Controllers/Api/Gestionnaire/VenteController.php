@@ -13,6 +13,49 @@ use Illuminate\Support\Facades\Schema;
 
 class VenteController extends Controller
 {
+    public function index(Request $request)
+    {
+        $gestionnaire = Auth::user();
+        $boutiqueId = $gestionnaire->boutique_id ?? $gestionnaire->boutiques()->first()?->id ?? 1;
+        $hasBoutiqueId = Schema::hasColumn('commandes', 'boutique_id');
+
+        $query = Commande::with(['articles.produit', 'boutique']);
+
+        if ($hasBoutiqueId) {
+            $query->where('boutique_id', $boutiqueId);
+        }
+
+        if ($request->filled('search')) {
+            $search = '%' . $request->search . '%';
+            $query->where(function ($q) use ($search) {
+                $q->where('code_reference', 'like', $search)
+                  ->orWhere('nom_client', 'like', $search)
+                  ->orWhere('prenom_client', 'like', $search)
+                  ->orWhere('telephone', 'like', $search);
+            });
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        $commandes = $query->orderBy('created_at', 'desc')->get();
+
+        $caTotal = $commandes->where('statut_commande', '!=', 'annulee')->sum('montant_total');
+        $nombreVentes = $commandes->count();
+        $panierMoyen = $nombreVentes > 0 ? round($caTotal / $nombreVentes, 2) : 0;
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $commandes,
+            'stats' => [
+                'ca_total' => $caTotal,
+                'nombre_ventes' => $nombreVentes,
+                'panier_moyen' => $panierMoyen,
+            ]
+        ]);
+    }
+
     public function store(Request $request)
     {
         $gestionnaire = Auth::user();

@@ -190,6 +190,7 @@ Route::prefix('gestionnaire')->middleware('auth:gestionnaire')->group(function (
     Route::get('/stock', [\App\Http\Controllers\Api\Gestionnaire\StockController::class, 'index']);
     Route::post('/stock/ajuster/{produit_id}', [\App\Http\Controllers\Api\Gestionnaire\StockController::class, 'ajuster']);
 
+    Route::get('/ventes', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'index']);
     Route::post('/ventes', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'store']);
     Route::get('/commandes/{id}/recu-pdf', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'genererRecuPdf']);
 

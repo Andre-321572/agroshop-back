@@ -14,30 +14,28 @@ class DashboardController extends Controller
     public function stats()
     {
         $gestionnaire = Auth::user();
-        $boutiqueId = $gestionnaire->boutique_id ?? 1;
+        $boutiqueId = $gestionnaire->boutique_id ?? $gestionnaire->boutiques()->first()?->id ?? 1;
         $hasBoutiqueId = Schema::hasColumn('commandes', 'boutique_id');
 
         $chiffreAffaires = 0;
         $ventesAujourdhui = 0;
         $caAujourdhui = 0;
 
-        if ($hasBoutiqueId) {
-            try {
-                $chiffreAffaires = (float) Commande::where('boutique_id', $boutiqueId)
-                    ->where('statut_commande', '!=', 'annulee')
-                    ->sum('montant_total');
-
-                $ventesAujourdhui = (int) Commande::where('boutique_id', $boutiqueId)
-                    ->whereDate('created_at', today())
-                    ->count();
-
-                $caAujourdhui = (float) Commande::where('boutique_id', $boutiqueId)
-                    ->whereDate('created_at', today())
-                    ->where('statut_commande', '!=', 'annulee')
-                    ->sum('montant_total');
-            } catch (\Throwable $e) {
-                // Ignorer si divergence de colonne
+        try {
+            $query = Commande::query();
+            if ($hasBoutiqueId && $boutiqueId) {
+                $query->where('boutique_id', $boutiqueId);
             }
+
+            $chiffreAffaires = (float) (clone $query)->where('statut_commande', '!=', 'annulee')->sum('montant_total');
+
+            $ventesAujourdhui = (int) (clone $query)->whereDate('created_at', today())->count();
+
+            $caAujourdhui = (float) (clone $query)->whereDate('created_at', today())
+                ->where('statut_commande', '!=', 'annulee')
+                ->sum('montant_total');
+        } catch (\Throwable $e) {
+            // Log fallback
         }
 
         $produitsEnStock = (int) BoutiqueProduit::where('boutique_id', $boutiqueId)->count();
