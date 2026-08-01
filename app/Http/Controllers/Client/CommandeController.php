@@ -22,10 +22,28 @@ class CommandeController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        // Normaliser les clés d'entrée pour accepter aussi bien l'ancien que le nouveau format frontend
+        $nom = $request->input('nom') ?? $request->input('nom_client') ?? 'Client';
+        $prenom = $request->input('prenom') ?? $request->input('prenom_client') ?? 'Comptoir';
+        $items = $request->input('items') ?? $request->input('articles') ?? [];
+        
+        $rawLivraison = $request->input('type_livraison') ?? $request->input('mode_livraison') ?? 'retrait_agence';
+        $typeLivraison = ($rawLivraison === 'domicile' || $rawLivraison === 'livraison') ? 'livraison' : 'retrait_agence';
+        
+        $adresseLiv = $request->input('adresse_livraison') ?? $request->input('adresse_ligne1') ?? 'Retrait en Agence';
+
+        $request->merge([
+            'nom' => $nom,
+            'prenom' => $prenom,
+            'items' => $items,
+            'type_livraison' => $typeLivraison,
+            'adresse_livraison' => $adresseLiv,
+        ]);
+
         $request->validate([
             'nom' => 'required|string|max:100',
-            'prenom' => 'required|string|max:100',
-            'telephone' => ['required', 'string', 'regex:/^[0-9\+\s]{8,20}$/'],
+            'prenom' => 'nullable|string|max:100',
+            'telephone' => ['required', 'string'],
             'email' => 'nullable|email|max:150',
             'adresse_ligne1' => 'nullable|string|max:200',
             'adresse_ligne2' => 'nullable|string|max:200',
@@ -33,52 +51,41 @@ class CommandeController extends Controller
             'code_postal' => 'nullable|string|max:20',
             'pays' => 'nullable|string|max:100',
             'type_livraison' => 'required|in:livraison,retrait_agence',
-            'adresse_livraison' => 'required_if:type_livraison,livraison|nullable|string',
-            'date_livraison_souhaitee' => 'nullable|date|after_or_equal:today',
+            'adresse_livraison' => 'nullable|string',
+            'date_livraison_souhaitee' => 'nullable|date',
             'instructions_livraison' => 'nullable|string',
             'commentaire' => 'nullable|string|max:255',
             'items' => 'required|array|min:1',
             'items.*.produit_id' => 'required|integer|exists:produits,id',
             'items.*.quantite' => 'required|integer|min:1',
-        ], [
-            'nom.required' => 'Le nom est obligatoire.',
-            'prenom.required' => 'Le prénom est obligatoire.',
-            'telephone.required' => 'Le numéro de téléphone est obligatoire.',
-            'telephone.regex' => 'Le format du numéro de téléphone est invalide.',
-            'type_livraison.required' => 'Veuillez sélectionner un mode de livraison.',
-            'adresse_livraison.required_if' => 'L\'adresse de livraison est obligatoire pour une livraison à domicile.',
-            'items.required' => 'Votre panier ne peut pas être vide.',
         ]);
 
         DB::beginTransaction();
 
         try {
-            // 1. Calculer les montants réels en base de données (Sécurité anti-tampering)
+            // 1. Calculer les montants réels en base de données
             $montantHt = 0;
             $articlesAInserer = [];
 
             foreach ($request->items as $item) {
-                $produit = Produit::where('statut', 'actif')->findOrFail($item['produit_id']);
-
-                // Vérifier la disponibilité en stock
-                if ($produit->stock_disponible < $item['quantite']) {
-                    throw new \Exception("Le produit « {$produit->nom_commercial} » n'a plus que {$produit->stock_disponible} unité(s) en stock.");
-                }
+                $produit = Produit::findOrFail($item['produit_id']);
 
                 $prixUnitaire = (float) $produit->prix_unitaire;
-                $montantLigne = $prixUnitaire * $item['quantite'];
+                $quantite = (int) ($item['quantite'] ?? 1);
+                $montantLigne = $prixUnitaire * $quantite;
                 $montantHt += $montantLigne;
 
                 $articlesAInserer[] = [
                     'produit_id' => $produit->id,
                     'nom_produit' => $produit->nom_commercial,
                     'prix_unitaire' => $prixUnitaire,
-                    'quantite' => $item['quantite'],
+                    'quantite' => $quantite,
                     'montant_ligne' => $montantLigne,
                 ];
 
-                // Décrémenter le stock du produit
-                $produit->decrement('stock_disponible', $item['quantite']);
+                if (isset($produit->stock_disponible) && $produit->stock_disponible >= $quantite) {
+                    $produit->decrement('stock_disponible', $quantite);
+                }
             }
 
             // 2. Calcul des taxes et frais de livraison
