@@ -8,6 +8,7 @@ use App\Models\Commande;
 use App\Models\CommandeArticle;
 use App\Models\Gestionnaire;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
