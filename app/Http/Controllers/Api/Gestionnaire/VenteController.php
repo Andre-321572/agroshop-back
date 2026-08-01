@@ -32,7 +32,12 @@ class VenteController extends Controller
         try {
             DB::beginTransaction();
 
+            // Calculate total first to avoid NOT NULL DB constraint errors
             $montant_total = 0;
+            foreach ($validated['articles'] as $item) {
+                $montant_total += ($item['quantite'] * $item['prix_unitaire']);
+            }
+
             $hasBoutiqueId = Schema::hasColumn('commandes', 'boutique_id');
 
             $commandeData = [
@@ -40,6 +45,15 @@ class VenteController extends Controller
                 'nom_client' => $validated['nom_client'],
                 'prenom_client' => $validated['prenom_client'] ?? '',
                 'telephone' => $validated['telephone'] ?? $validated['telephone_client'] ?? '',
+                'email' => $validated['email'] ?? 'comptoir@agroshop.tg',
+                'adresse_ligne1' => 'Vente en comptoir boutique',
+                'ville' => 'Lomé',
+                'pays' => 'Togo',
+                'montant_ht' => $montant_total,
+                'montant_tva' => 0,
+                'montant_ttc' => $montant_total,
+                'frais_livraison' => 0,
+                'montant_total' => $montant_total,
                 'statut_commande' => 'livree', // Vente directe en boutique = livrée
                 'statut_paiement' => 'paye', // Vente directe = payé
                 'type_livraison' => 'retrait_agence',
@@ -71,7 +85,6 @@ class VenteController extends Controller
                 $stock->save();
 
                 $montant_ligne = $item['quantite'] * $item['prix_unitaire'];
-                $montant_total += $montant_ligne;
 
                 CommandeArticle::create([
                     'commande_id' => $commande->id,
@@ -81,8 +94,6 @@ class VenteController extends Controller
                     'montant_ligne' => $montant_ligne,
                 ]);
             }
-
-            $commande->update(['montant_total' => $montant_total, 'montant_ttc' => $montant_total]);
 
             DB::commit();
 
@@ -101,7 +112,11 @@ class VenteController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Erreur lors de la vente', 'error' => $e->getMessage()], 400);
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage() ?: 'Erreur lors de la vente',
+                'error' => $e->getMessage()
+            ], 400);
         }
     }
 }
