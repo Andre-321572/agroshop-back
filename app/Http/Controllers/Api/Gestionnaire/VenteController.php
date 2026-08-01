@@ -205,4 +205,43 @@ class VenteController extends Controller
 
         return response()->json(['message' => 'Bibliothèque Dompdf non disponible'], 500);
     }
+
+    /**
+     * POST/PUT /api/gestionnaire/commandes/{id}/statut
+     */
+    public function updateStatut(Request $request, $id): JsonResponse
+    {
+        $request->validate([
+            'statut_commande' => 'required|string|in:en_attente,confirmee,preparee,expediee,livree,annulee',
+        ]);
+
+        $commande = Commande::findOrFail($id);
+        $ancienStatut = $commande->statut_commande;
+        $nouveauStatut = $request->input('statut_commande');
+
+        $updateData = ['statut_commande' => $nouveauStatut];
+        if ($nouveauStatut === 'livree') {
+            $updateData['statut_paiement'] = 'paye';
+        }
+
+        $commande->update($updateData);
+
+        try {
+            if (Schema::hasTable('commande_suivis')) {
+                \App\Models\CommandeSuivi::create([
+                    'commande_id' => $commande->id,
+                    'statut_precedent' => $ancienStatut,
+                    'nouveau_statut' => $nouveauStatut,
+                    'commentaire' => $request->input('commentaire', 'Changement de statut par le gestionnaire'),
+                    'utilisateur_id' => null,
+                ]);
+            }
+        } catch (\Throwable $e) {}
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Statut de la commande mis à jour avec succès.',
+            'data' => $commande->fresh()
+        ]);
+    }
 }

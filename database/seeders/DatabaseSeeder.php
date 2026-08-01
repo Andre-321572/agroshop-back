@@ -4,11 +4,13 @@ namespace Database\Seeders;
 
 use App\Models\Administrateur;
 use App\Models\ArticleBlog;
+use App\Models\Boutique;
 use App\Models\Categorie;
 use App\Models\Commande;
 use App\Models\CommandeArticle;
 use App\Models\CommandeSuivi;
 use App\Models\ParametreSysteme;
+use App\Models\Partenaire;
 use App\Models\Produit;
 use App\Models\ProduitDocument;
 use App\Models\ProduitImage;
@@ -20,495 +22,890 @@ use Illuminate\Support\Facades\Hash;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database with initial Agroshop data.
+     * Seed the application's database with exact data from digit2611587_1tdqvu.sql.
      */
     public function run(): void
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
         // 1. Seed Administrateurs
-        $admin1 = Administrateur::updateOrCreate(
-            ['email' => 'admin@agroshoptg.store'],
+        $administrateurs = [
             [
+                'id' => 1,
                 'nom' => 'Super',
                 'prenom' => 'Admin',
+                'email' => 'admin@agroshoptg.store',
                 'mot_de_passe' => Hash::make('password123'),
                 'role' => 'super_admin',
-                'actif' => true,
-            ]
-        );
-
-        
-        Administrateur::updateOrCreate(
-            ['email' => 'admin@agroshop.tg'],
+                'actif' => 1,
+                'derniere_connexion' => null,
+                'created_at' => '2025-10-06 21:00:00',
+                'updated_at' => '2025-10-06 21:00:00',
+            ],
             [
-                'nom' => 'Super',
-                'prenom' => 'Admin',
-                'mot_de_passe' => Hash::make('password123'),
-                'role' => 'super_admin',
-                'actif' => true,
-            ]
-        );
-
-        Administrateur::updateOrCreate(
-            ['email' => 'sewodakomla@gmail.com'],
-            [
-                'nom' => 'Sewoda',
-                'prenom' => 'Komla',
+                'id' => 2,
+                'nom' => 'sewoda',
+                'prenom' => 'sewoda',
+                'email' => 'sewodakomla@gmail.com',
                 'mot_de_passe' => '$2y$10$gco9QjhVMmGHwtRyU2DJJOw9KF7OsechGSgfyZFNEVP5PX6S/4Wjy',
                 'role' => 'admin',
-                'actif' => true,
-            ]
-        );
-
-        Administrateur::updateOrCreate(
-            ['email' => 'contact@agroshoptg.store'],
+                'actif' => 1,
+                'derniere_connexion' => null,
+                'created_at' => '2025-10-06 21:38:00',
+                'updated_at' => '2025-10-06 21:39:29',
+            ],
             [
+                'id' => 3,
+                'nom' => 'andre',
+                'prenom' => 'MAWUSSI',
+                'email' => 'mawussiandres7@gmail.com',
+                'mot_de_passe' => '$2y$10$5LmeOq.BOuvVWoKiCIKL4umE/FEWRevHv/3z4k2DkWskoKkWjOl3W',
+                'role' => 'admin',
+                'actif' => 1,
+                'derniere_connexion' => null,
+                'created_at' => '2025-10-06 23:30:53',
+                'updated_at' => '2025-11-19 10:12:06',
+            ],
+            [
+                'id' => 4,
+                'nom' => 'KODJO',
+                'prenom' => 'Rodrigue',
+                'email' => 'kodjorodrigue84@gmail.com',
+                'mot_de_passe' => '$2y$10$iSwmmghKsUmkLTFOh2rDau8/covV7zMlEKv8Z1ZI/.Hog9G4obNxK',
+                'role' => 'admin',
+                'actif' => 1,
+                'derniere_connexion' => null,
+                'created_at' => '2025-10-07 11:02:59',
+                'updated_at' => '2025-10-07 11:02:59',
+            ],
+            [
+                'id' => 6,
+                'nom' => 'God',
+                'prenom' => 'Santos',
+                'email' => 'zagabambo1@gmail.com',
+                'mot_de_passe' => '$2y$10$xY1LAqb8T5gUQQIemBrhTeaSmqd.7VUbLQyOMLoPnoDvIzJKe./5O',
+                'role' => 'admin',
+                'actif' => 1,
+                'derniere_connexion' => null,
+                'created_at' => '2025-10-22 07:32:17',
+                'updated_at' => '2025-10-22 07:32:17',
+            ],
+            [
+                'id' => 7,
+                'nom' => 'Sewodaben',
+                'prenom' => 'Admin',
+                'email' => 'sewodaben@gmail.com',
+                'mot_de_passe' => '$2y$10$9jpAHwkynl8udkNgfxdtMuwekeG7tlUuiq1TAEk.56aXwKguj5IUa',
+                'role' => 'admin',
+                'actif' => 1,
+                'derniere_connexion' => null,
+                'created_at' => '2025-11-19 10:11:30',
+                'updated_at' => '2025-11-19 10:11:30',
+            ],
+            [
+                'id' => 8,
+                'nom' => 'Zagabambo',
+                'prenom' => 'Admin',
+                'email' => 'zagabambo@gmail.com',
+                'mot_de_passe' => '$2y$10$gFir4omR.t3.4TaEfF5O/O77ibOLA8OWd9FtovEMxHToTvadkglGK',
+                'role' => 'admin',
+                'actif' => 1,
+                'derniere_connexion' => null,
+                'created_at' => '2025-12-03 00:57:15',
+                'updated_at' => '2025-12-03 00:57:15',
+            ],
+            [
+                'id' => 14,
                 'nom' => 'Contact',
                 'prenom' => 'Admin',
+                'email' => 'contact@agroshoptg.store',
                 'mot_de_passe' => '$2y$10$YAiafSuzDQgDLm.9WMpBquts0ioPSxpkFhYFdoqC5yjrZxYsC5mmu',
                 'role' => 'admin',
-                'actif' => true,
-            ]
-        );
+                'actif' => 1,
+                'derniere_connexion' => null,
+                'created_at' => '2026-02-18 23:07:20',
+                'updated_at' => '2026-02-18 23:07:20',
+            ],
+            [
+                'id' => 15,
+                'nom' => 'BOLOU',
+                'prenom' => 'DONALD',
+                'email' => 'donaldbolou8@gmail.com',
+                'mot_de_passe' => '$2y$10$xs4TacrPGKwri36xyTfEf.oMKjfC/.T7kBn8Pb6fjhrxPpoCekIq2',
+                'role' => 'admin',
+                'actif' => 1,
+                'derniere_connexion' => null,
+                'created_at' => '2026-04-07 10:19:06',
+                'updated_at' => '2026-04-07 10:19:06',
+            ],
+        ];
+
+        foreach ($administrateurs as $admin) {
+            DB::table('administrateurs')->updateOrInsert(['id' => $admin['id']], $admin);
+        }
 
         // 2. Seed Paramètres Système
         $parametres = [
-            ['cle_parametre' => 'site_nom', 'valeur_parametre' => 'AGROSHOP', 'description_parametre' => 'Nom du site web', 'type_parametre' => 'string'],
-            ['cle_parametre' => 'tva_taux', 'valeur_parametre' => '18', 'description_parametre' => 'Taux de TVA en pourcentage', 'type_parametre' => 'integer'],
-            ['cle_parametre' => 'frais_livraison_base', 'valeur_parametre' => '5000', 'description_parametre' => 'Frais de livraison de base en FCFA', 'type_parametre' => 'integer'],
-            ['cle_parametre' => 'stock_alerte_global', 'valeur_parametre' => '10', 'description_parametre' => 'Seuil d\'alerte stock par défaut', 'type_parametre' => 'integer'],
-            ['cle_parametre' => 'commande_auto_confirm', 'valeur_parametre' => 'false', 'description_parametre' => 'Confirmation automatique des commandes', 'type_parametre' => 'boolean'],
+            ['id' => 1, 'cle_parametre' => 'site_nom', 'valeur_parametre' => 'AGROSHOP', 'description_parametre' => 'Nom du site web', 'type_parametre' => 'string', 'updated_at' => '2025-06-02 22:36:22'],
+            ['id' => 2, 'cle_parametre' => 'tva_taux', 'valeur_parametre' => '18', 'description_parametre' => 'Taux de TVA en pourcentage', 'type_parametre' => 'integer', 'updated_at' => '2025-06-02 22:36:22'],
+            ['id' => 3, 'cle_parametre' => 'frais_livraison_base', 'valeur_parametre' => '5000', 'description_parametre' => 'Frais de livraison de base en FCFA', 'type_parametre' => 'integer', 'updated_at' => '2025-06-02 22:36:22'],
+            ['id' => 4, 'cle_parametre' => 'stock_alerte_global', 'valeur_parametre' => '10', 'description_parametre' => 'Seuil d\'alerte stock par défaut', 'type_parametre' => 'integer', 'updated_at' => '2025-06-02 22:36:22'],
+            ['id' => 5, 'cle_parametre' => 'commande_auto_confirm', 'valeur_parametre' => 'false', 'description_parametre' => 'Confirmation automatique des commandes', 'type_parametre' => 'boolean', 'updated_at' => '2025-06-02 22:36:22'],
         ];
 
-        foreach ($parametres as $p) {
-            ParametreSysteme::updateOrCreate(['cle_parametre' => $p['cle_parametre']], $p);
+        foreach ($parametres as $param) {
+            DB::table('parametres_systeme')->updateOrInsert(['id' => $param['id']], $param);
         }
 
         // 3. Seed Catégories
-        $categoriesParentes = [
-            ['id' => 1, 'nom' => 'Intrants Agricoles', 'description' => 'Engrais, urée, NPK et amendements', 'parent_id' => null, 'slug' => 'intrants-agricoles', 'ordre_affichage' => 1, 'actif' => 1],
-            ['id' => 2, 'nom' => 'Produits Phytosanitaires', 'description' => 'Insecticides, fongicides, herbicides', 'parent_id' => null, 'slug' => 'produits-phytosanitaires', 'ordre_affichage' => 2, 'actif' => 1],
-            ['id' => 3, 'nom' => 'Systèmes d\'Irrigation', 'description' => 'Équipements et accessoires d\'irrigation', 'parent_id' => null, 'slug' => 'systemes-irrigation', 'ordre_affichage' => 3, 'actif' => 1],
-            ['id' => 4, 'nom' => 'Semences', 'description' => 'Graines et semences diverses', 'parent_id' => null, 'slug' => 'semences', 'ordre_affichage' => 4, 'actif' => 1],
-            ['id' => 5, 'nom' => 'Machines Agricoles', 'description' => 'Tracteurs, motoculteurs, équipements', 'parent_id' => null, 'slug' => 'machines-agricoles', 'ordre_affichage' => 5, 'actif' => 1],
-            ['id' => 6, 'nom' => 'Quincaillerie', 'description' => 'Outils et accessoires divers', 'parent_id' => null, 'slug' => 'quincaillerie', 'ordre_affichage' => 6, 'actif' => 1],
+        $categories = [
+            ['id' => 1, 'nom' => 'Intrants Agricoles', 'description' => 'Engrais, urée, NPK et amendements', 'parent_id' => null, 'slug' => 'intrants-agricoles', 'ordre_affichage' => 1, 'actif' => 1, 'created_at' => '2025-06-02 22:36:21', 'updated_at' => '2025-06-02 22:36:21'],
+            ['id' => 2, 'nom' => 'Produits Phytosanitaires', 'description' => 'Insecticides, fongicides, herbicides', 'parent_id' => null, 'slug' => 'produits-phytosanitaires', 'ordre_affichage' => 2, 'actif' => 1, 'created_at' => '2025-06-02 22:36:21', 'updated_at' => '2025-06-02 22:36:21'],
+            ['id' => 3, 'nom' => 'Systèmes d\'Irrigation', 'description' => 'Équipements et accessoires d\'irrigation', 'parent_id' => null, 'slug' => 'systemes-irrigation', 'ordre_affichage' => 3, 'actif' => 1, 'created_at' => '2025-06-02 22:36:21', 'updated_at' => '2025-06-02 22:36:21'],
+            ['id' => 4, 'nom' => 'Semences', 'description' => 'Graines et semences diverses', 'parent_id' => null, 'slug' => 'semences', 'ordre_affichage' => 4, 'actif' => 1, 'created_at' => '2025-06-02 22:36:21', 'updated_at' => '2025-06-02 22:36:21'],
+            ['id' => 5, 'nom' => 'Machines Agricoles', 'description' => 'Tracteurs, motoculteurs, équipements', 'parent_id' => null, 'slug' => 'machines-agricoles', 'ordre_affichage' => 5, 'actif' => 1, 'created_at' => '2025-06-02 22:36:21', 'updated_at' => '2025-06-02 22:36:21'],
+            ['id' => 6, 'nom' => 'Quincaillerie', 'description' => 'Outils et accessoires divers', 'parent_id' => null, 'slug' => 'quincaillerie', 'ordre_affichage' => 6, 'actif' => 1, 'created_at' => '2025-06-02 22:36:21', 'updated_at' => '2025-06-02 22:36:21'],
+            ['id' => 7, 'nom' => 'Engrais NPK', 'description' => 'Engrais composés azote-phosphore-potassium', 'parent_id' => 1, 'slug' => 'engrais-npk', 'ordre_affichage' => 1, 'actif' => 1, 'created_at' => '2025-06-02 22:36:22', 'updated_at' => '2025-06-02 22:36:22'],
+            ['id' => 8, 'nom' => 'Urée', 'description' => 'Engrais azoté', 'parent_id' => 1, 'slug' => 'uree', 'ordre_affichage' => 2, 'actif' => 1, 'created_at' => '2025-06-02 22:36:22', 'updated_at' => '2025-06-02 22:36:22'],
+            ['id' => 9, 'nom' => 'Engrais Organiques', 'description' => 'Fumiers et composts', 'parent_id' => 1, 'slug' => 'engrais-organiques', 'ordre_affichage' => 3, 'actif' => 1, 'created_at' => '2025-06-02 22:36:22', 'updated_at' => '2025-06-02 22:36:22'],
+            ['id' => 10, 'nom' => 'Insecticides', 'description' => 'Produits contre les insectes nuisibles', 'parent_id' => 2, 'slug' => 'insecticides', 'ordre_affichage' => 1, 'actif' => 1, 'created_at' => '2025-06-02 22:36:22', 'updated_at' => '2025-06-02 22:36:22'],
+            ['id' => 11, 'nom' => 'Fongicides', 'description' => 'Produits contre les maladies fongiques', 'parent_id' => 2, 'slug' => 'fongicides', 'ordre_affichage' => 2, 'actif' => 1, 'created_at' => '2025-06-02 22:36:22', 'updated_at' => '2025-06-02 22:36:22'],
+            ['id' => 12, 'nom' => 'Herbicides', 'description' => 'Produits contre les mauvaises herbes', 'parent_id' => 2, 'slug' => 'herbicides', 'ordre_affichage' => 3, 'actif' => 1, 'created_at' => '2025-06-02 22:36:22', 'updated_at' => '2025-06-02 22:36:22'],
+            ['id' => 13, 'nom' => 'Nématicides', 'description' => 'Produits contre les nématodes', 'parent_id' => 2, 'slug' => 'nematicides', 'ordre_affichage' => 4, 'actif' => 1, 'created_at' => '2025-06-02 22:36:22', 'updated_at' => '2025-06-02 22:36:22'],
         ];
 
-        foreach ($categoriesParentes as $c) {
-            Categorie::updateOrCreate(['id' => $c['id']], $c);
+        foreach ($categories as $cat) {
+            DB::table('categories')->updateOrInsert(['id' => $cat['id']], $cat);
         }
 
-        $sousCategories = [
-            ['id' => 7, 'nom' => 'Engrais NPK', 'description' => 'Engrais composés azote-phosphore-potassium', 'parent_id' => 1, 'slug' => 'engrais-npk', 'ordre_affichage' => 1, 'actif' => 1],
-            ['id' => 8, 'nom' => 'Urée', 'description' => 'Engrais azoté', 'parent_id' => 1, 'slug' => 'uree', 'ordre_affichage' => 2, 'actif' => 1],
-            ['id' => 9, 'nom' => 'Engrais Organiques', 'description' => 'Fumiers et composts', 'parent_id' => 1, 'slug' => 'engrais-organiques', 'ordre_affichage' => 3, 'actif' => 1],
-            ['id' => 10, 'nom' => 'Insecticides', 'description' => 'Produits contre les insectes nuisibles', 'parent_id' => 2, 'slug' => 'insecticides', 'ordre_affichage' => 1, 'actif' => 1],
-            ['id' => 11, 'nom' => 'Fongicides', 'description' => 'Produits contre les maladies fongiques', 'parent_id' => 2, 'slug' => 'fongicides', 'ordre_affichage' => 2, 'actif' => 1],
-            ['id' => 12, 'nom' => 'Herbicides', 'description' => 'Produits contre les mauvaises herbes', 'parent_id' => 2, 'slug' => 'herbicides', 'ordre_affichage' => 3, 'actif' => 1],
-            ['id' => 13, 'nom' => 'Nématicides', 'description' => 'Produits contre les nématodes', 'parent_id' => 2, 'slug' => 'nematicides', 'ordre_affichage' => 4, 'actif' => 1],
-            ['id' => 14, 'nom' => 'Outillage Manuel', 'description' => 'Pelles, pioches, machettes, marteaux et outils à main', 'parent_id' => 6, 'slug' => 'outillage-manuel', 'ordre_affichage' => 1, 'actif' => 1],
-            ['id' => 15, 'nom' => 'Équipements & Protection', 'description' => 'Brouettes, gants, bottes et matériel de chantier', 'parent_id' => 6, 'slug' => 'equipements-protection', 'ordre_affichage' => 2, 'actif' => 1],
-        ];
-
-        foreach ($sousCategories as $c) {
-            Categorie::updateOrCreate(['id' => $c['id']], $c);
-        }
-
-        // 4. Seed 7 Produits de démonstration (AgroDop / Phytosanitaire / Semences / Irrigation / Machines / Quincaillerie)
-        $produit1 = Produit::updateOrCreate(
-            ['id' => 1],
+        // 4. Seed Produits
+        $produits = [
             [
-                'nom_commercial' => 'Urée YARA 46% N',
-                'description' => 'Engrais azoté concentré contenant 46 % d’azote, idéal pour stimuler la croissance végétative des cultures de maïs, riz et maraîchage.',
-                'composition' => 'Urée granulée contenant 46 % d\'Azote total (N).',
+                'id' => 1,
+                'nom_commercial' => 'Urée YARA',
+                'description' => 'Engrais azoté concentré contenant 46 % d’azote, idéal pour stimuler la croissance végétative des cultures.',
+                'composition' => 'Urée granulée contenant 46 % de N (azote total).',
                 'principes_actifs' => 'Azote (N) = 46 %.',
-                'mode_emploi' => 'Appliquer au sol avant ou après semis, puis arroser pour faciliter la dissolution et éviter les pertes par volatilisation.',
-                'dosage_recommande' => '50 à 100 kg/ha selon le type de culture et le type de sol.',
-                'precautions_usage' => 'Conserver dans un endroit sec et à l’abri de l’humidité. Porter des gants lors de la manipulation.',
-                'contre_indications' => 'Ne pas mélanger directement avec des engrais phosphatés ou potassiques concentrés lors de l\'application.',
+                'mode_emploi' => 'Appliquer au sol avant ou après semis, puis arroser pour faciliter la dissolution.',
+                'dosage_recommande' => '50 à 100 kg/ha selon la culture.',
+                'precautions_usage' => 'Conserver à l’abri de l’humidité. Porter des gants lors de la manipulation.',
+                'contre_indications' => 'Ne pas mélanger directement avec des engrais phosphatés ou potassiques concentrés.',
                 'prix_unitaire' => 15000.00,
-                'unite_mesure' => 'sac 50kg',
+                'unite_mesure' => 'kg',
                 'stock_disponible' => 1000,
-                'stock_alerte' => 20,
-                'poids' => 50.00,
-                'statut' => 'actif',
-                'featured' => true,
-                'slug' => 'uree-yara-46-n',
-            ]
-        );
-
-        $produit2 = Produit::updateOrCreate(
-            ['id' => 2],
-            [
-                'nom_commercial' => 'Engrais NPK 15-15-15 SuperFert',
-                'description' => 'Engrais composé équilibré apportant les trois éléments majeurs (Azote, Phosphore, Potassium) pour un développement harmonieux de toutes les cultures.',
-                'composition' => '15% N (Azote), 15% P2O5 (Phosphore), 15% K2O (Potassium).',
-                'principes_actifs' => 'N-P-K 15-15-15 + Oligo-éléments.',
-                'mode_emploi' => 'Enfouir légèrement autour des plants au moment du repiquage ou en fertilisation de couverture.',
-                'dosage_recommande' => '150 à 300 kg/ha selon les exigences de la culture.',
-                'precautions_usage' => 'Stocker au sec sur des palettes. Éviter le contact direct avec les racines lors du semis.',
-                'contre_indications' => 'Éviter le surdosage en période de sécheresse sévère sans irrigation.',
-                'prix_unitaire' => 18500.00,
-                'unite_mesure' => 'sac 50kg',
-                'stock_disponible' => 750,
-                'stock_alerte' => 15,
-                'poids' => 50.00,
-                'statut' => 'actif',
-                'featured' => true,
-                'slug' => 'engrais-npk-15-15-15-superfert',
-            ]
-        );
-
-        $produit3 = Produit::updateOrCreate(
-            ['id' => 3],
-            [
-                'nom_commercial' => 'Insecticide Katana 50 EC',
-                'description' => 'Insecticide polyvalent à large spectre d\'action, particulièrement efficace contre la chenille légionnaire, les pucerons et les thrips.',
-                'composition' => 'Emulsion concentrée contenant 50 g/L de Cyperméthrine.',
-                'principes_actifs' => 'Cyperméthrine 50 g/L.',
-                'mode_emploi' => 'Diluer dans l\'eau et pulvériser uniformément sur le feuillage dès l\'apparition des premiers prédateurs.',
-                'dosage_recommande' => '1 Litre / hectare (soit 50ml pour un pulvérisateur de 15 Litres).',
-                'precautions_usage' => 'Porter une tenue de protection complète, des gants et un masque. Ne pas traiter pendant les heures chaudes.',
-                'contre_indications' => 'Toxique pour les organismes aquatiques et les abeilles. Ne pas appliquer en période de floraison active.',
-                'prix_unitaire' => 7500.00,
-                'unite_mesure' => 'flacon 1L',
-                'stock_disponible' => 300,
                 'stock_alerte' => 10,
-                'poids' => 1.20,
+                'poids' => 40.00,
+                'dimensions' => '',
                 'statut' => 'actif',
-                'featured' => false,
-                'slug' => 'insecticide-katana-50-ec',
-            ]
-        );
-
-        $produit4 = Produit::updateOrCreate(
-            ['id' => 4],
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'ur-e-yara',
+                'created_at' => '2025-10-06 23:57:28',
+                'updated_at' => '2025-10-07 00:08:27',
+            ],
             [
-                'nom_commercial' => 'Semence Maïs Hybride PAN 53',
-                'description' => 'Variété de maïs hybride à très haut potentiel de rendement, tolérante à la sécheresse et résistante aux principales maladies foliaires.',
-                'composition' => 'Graines certifiées de Maïs hybride (Zea mays). Taux de germination > 95%.',
-                'principes_actifs' => 'Traitement de semence fongicide/insecticide préventif.',
-                'mode_emploi' => 'Semer à une profondeur de 3 à 5 cm avec un écartement de 75 cm entre les lignes et 25 cm entre les poquets.',
-                'dosage_recommande' => '20 à 25 kg/ha pour une densité optimale.',
-                'precautions_usage' => 'Conserver dans un endroit frais et sec. Ne pas consommer les graines traitées.',
-                'contre_indications' => 'Ne pas semer en sol noyé ou mal drainé.',
-                'prix_unitaire' => 12000.00,
-                'unite_mesure' => 'sac 5kg',
-                'stock_disponible' => 500,
+                'id' => 2,
+                'nom_commercial' => 'Betterave BORO F1',
+                'description' => 'Variété hybride de betterave rouge très productive, à racines rondes, chair rouge intense, adaptée aux climats tropicaux et tempérés.',
+                'composition' => 'Graines hybrides de betterave rouge (Beta vulgaris).',
+                'principes_actifs' => 'Semences hybrides F1 – non traitées chimiquement.',
+                'mode_emploi' => 'Semer directement en pleine terre à 2 cm de profondeur, espacement de 25 cm entre les lignes.',
+                'dosage_recommande' => '1 kg pour 400 m² environ.',
+                'precautions_usage' => 'Conserver les graines dans un endroit sec et frais avant le semis.',
+                'contre_indications' => 'Éviter les sols trop acides ou saturés d’eau.',
+                'prix_unitaire' => 4000.00,
+                'unite_mesure' => 'g',
+                'stock_disponible' => 9996,
                 'stock_alerte' => 10,
-                'poids' => 5.00,
+                'poids' => 12.00,
+                'dimensions' => '',
                 'statut' => 'actif',
-                'featured' => true,
-                'slug' => 'semence-mais-hybride-pan-53',
-            ]
-        );
-
-        $produit5 = Produit::updateOrCreate(
-            ['id' => 5],
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'betterave-boro-f1',
+                'created_at' => '2025-10-07 00:00:33',
+                'updated_at' => '2026-07-14 15:06:30',
+            ],
             [
-                'nom_commercial' => 'Kit d\'Irrigation Goutte-à-Goutte 500m²',
-                'description' => 'Système complet d\'irrigation au goutte-à-goutte prêt à installer pour le maraîchage, serres ou petits vergers. Économise jusqu\'à 60% d\'eau.',
-                'composition' => 'Tuyau principal PE 25mm (50m), gaines goutte-à-goutte 16mm avec goutteurs espacés de 20cm (500m), vannes de secteur, filtre à disque et raccords.',
-                'mode_emploi' => 'Raccorder à une réserve d\'eau surélevée ou à une pompe. Ouvrir le filtre et nettoyer régulièrement.',
-                'dosage_recommande' => 'Débit de 1.5 L/h par goutteur sous pression de 1 bar.',
-                'precautions_usage' => 'Installer un filtre à disque pour éviter l\'obturation des goutteurs.',
-                'prix_unitaire' => 85000.00,
-                'unite_mesure' => 'kit complet',
-                'stock_disponible' => 45,
-                'stock_alerte' => 5,
-                'poids' => 18.00,
-                'statut' => 'actif',
-                'featured' => true,
-                'slug' => 'kit-irrigation-goutte-a-goutte-500m2',
-            ]
-        );
-
-        $produit6 = Produit::updateOrCreate(
-            ['id' => 6],
+                'id' => 3,
+                'nom_commercial' => 'Lance de pulvérisateur agricole',
+                'description' => 'Lance de pulvérisation manuelle en plastique et métal, conçue pour les pulvérisateurs à pression. Elle permet une diffusion fine et régulière des produits liquides (engrais foliaires, pesticides, etc.).',
+                'composition' => 'Plastique ABS renforcé, acier inoxydable, joint d’étanchéité en caoutchouc.',
+                'principes_actifs' => 'Aucun (accessoire mécanique).',
+                'mode_emploi' => 'Connecter la lance au tuyau du pulvérisateur, remplir le réservoir avec le liquide à appliquer, puis presser la gâchette pour pulvériser.',
+                'dosage_recommande' => 'Dépend du produit utilisé avec la lance.',
+                'precautions_usage' => 'Toujours porter des gants et lunettes lors de l’utilisation de produits chimiques. Rincer la lance après chaque usage.',
+                'contre_indications' => 'Ne pas utiliser avec des liquides corrosifs ou inflammables.',
+                'prix_unitaire' => 1500.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 10000,
+                'stock_alerte' => 10,
+                'poids' => 0.50,
+                'dimensions' => '50 x 40 x 80 cm',
+                'statut' => 'inactif',
+                'featured' => 0,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'lance-de-pulv-risateur-agricole',
+                'created_at' => '2025-10-07 00:11:41',
+                'updated_at' => '2025-10-07 00:11:41',
+            ],
             [
+                'id' => 4,
                 'nom_commercial' => 'Atomiseur STIHL SR 450',
-                'description' => 'Appareil de pulvérisation motorisé haute performance porté sur le dos, idéal pour la protection des grandes cultures, arbres fruitiers et désinfection.',
-                'composition' => 'Moteur 2 temps STIHL 63.3 cm³, réservoir de produit 14 Litres, portée horizontale jusqu\'à 14.5 mètres.',
-                'mode_emploi' => 'Remplir le réservoir de carburant (mélange 2%), préparer le produit phytosanitaire et démarrer au lanceur.',
-                'dosage_recommande' => 'Utiliser avec des buses adaptées selon le type de traitement (brouillard fin ou gros débit).',
-                'precautions_usage' => 'Utiliser des protections auditives et respiratoires. Entretien régulier du filtre à air.',
+                'description' => 'Appareil de pulvérisation motorisé porté sur le dos, utilisé pour la protection des cultures et l’application de produits phytosanitaires.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
                 'prix_unitaire' => 515000.00,
                 'unite_mesure' => 'unité',
-                'stock_disponible' => 25,
-                'stock_alerte' => 3,
-                'poids' => 12.80,
-                'statut' => 'actif',
-                'featured' => true,
-                'slug' => 'atomiseur-stihl-sr-450',
-            ]
-        );
-
-        $produit7 = Produit::updateOrCreate(
-            ['id' => 7],
-            [
-                'nom_commercial' => 'Brouette de Chantier Renforcée 90L',
-                'description' => 'Brouette professionnelle de quincaillerie à châssis tubulaire monobloc et bac galvanisé. Conçue pour le transport de charges lourdes et d\'outils.',
-                'composition' => 'Bac en acier galvanisé anticorrosion (épaisseur 1mm), châssis en tube d\'acier 32mm, roue gonflable grand diamètre 400mm.',
-                'mode_emploi' => 'Vérifier la pression de la roue gonflable (max 2 bar) avant chargement.',
-                'dosage_recommande' => 'Charge utile maximale conseillée : 160 kg.',
-                'precautions_usage' => 'Ne pas dépasser la charge maximale. Graisser l\'axe de la roue périodiquement.',
-                'prix_unitaire' => 32000.00,
-                'unite_mesure' => 'unité',
-                'stock_disponible' => 120,
-                'stock_alerte' => 10,
-                'poids' => 14.50,
-                'statut' => 'actif',
-                'featured' => false,
-                'slug' => 'brouette-de-chantier-renforcee-90l',
-            ]
-        );
-
-        $produit8 = Produit::updateOrCreate(
-            ['id' => 8],
-            [
-                'nom_commercial' => 'Machette d\'Agriculture & Chantier 22"',
-                'description' => 'Outil de coupe et de quincaillerie de haute qualité en acier trempé avec manche ergonomique antidérapant.',
-                'composition' => 'Lame en acier au carbone poli 22 pouces (55cm), manche polymère riveté.',
-                'mode_emploi' => 'Utiliser pour le défrichement, le débroussaillage et le travail de quincaillerie/chantier.',
-                'dosage_recommande' => 'Affûter régulièrement la lame pour une efficacité optimale.',
-                'precautions_usage' => 'Manipuler avec précaution. Porter des gants de protection et un étui de rangement.',
-                'prix_unitaire' => 4500.00,
-                'unite_mesure' => 'unité',
-                'stock_disponible' => 250,
+                'stock_disponible' => 99999998,
                 'stock_alerte' => 20,
-                'poids' => 0.85,
+                'poids' => 10.00,
+                'dimensions' => '70 cm x 50 cm x 35 cm',
                 'statut' => 'actif',
-                'featured' => true,
-                'slug' => 'machette-agriculture-chantier-22',
-            ]
-        );
-
-        // Association catégories & images
-        $produit1->categories()->syncWithoutDetaching([8 => ['principale' => 1]]); // Urée
-        $produit2->categories()->syncWithoutDetaching([7 => ['principale' => 1]]); // Engrais NPK
-        $produit3->categories()->syncWithoutDetaching([10 => ['principale' => 1]]); // Insecticides
-        $produit4->categories()->syncWithoutDetaching([4 => ['principale' => 1]]); // Semences
-        $produit5->categories()->syncWithoutDetaching([3 => ['principale' => 1]]); // Systèmes d'Irrigation
-        $produit6->categories()->syncWithoutDetaching([5 => ['principale' => 1]]); // Machines Agricoles
-        $produit7->categories()->syncWithoutDetaching([15 => ['principale' => 1]]); // Quincaillerie / Équipements
-        $produit8->categories()->syncWithoutDetaching([14 => ['principale' => 1]]); // Quincaillerie / Outillage Manuel
-
-        ProduitImage::updateOrCreate(['id' => 1], ['produit_id' => 1, 'nom_fichier' => 'urea.jpg', 'url_image' => 'storage/produits/urea.jpg', 'alt_text' => 'Image Urée YARA', 'ordre_affichage' => 0, 'principale' => true]);
-        ProduitImage::updateOrCreate(['id' => 2], ['produit_id' => 2, 'nom_fichier' => 'npk.jpg', 'url_image' => 'storage/produits/npk.jpg', 'alt_text' => 'Image Engrais NPK', 'ordre_affichage' => 0, 'principale' => true]);
-        ProduitImage::updateOrCreate(['id' => 3], ['produit_id' => 3, 'nom_fichier' => 'katana.jpg', 'url_image' => 'storage/produits/katana.jpg', 'alt_text' => 'Image Insecticide Katana', 'ordre_affichage' => 0, 'principale' => true]);
-        ProduitImage::updateOrCreate(['id' => 4], ['produit_id' => 4, 'nom_fichier' => 'mais_pan53.jpg', 'url_image' => 'storage/produits/mais_pan53.jpg', 'alt_text' => 'Image Semence Maïs PAN 53', 'ordre_affichage' => 0, 'principale' => true]);
-        ProduitImage::updateOrCreate(['id' => 5], ['produit_id' => 5, 'nom_fichier' => 'irrigation_kit.jpg', 'url_image' => 'storage/produits/irrigation_kit.jpg', 'alt_text' => 'Image Kit Irrigation', 'ordre_affichage' => 0, 'principale' => true]);
-        ProduitImage::updateOrCreate(['id' => 6], ['produit_id' => 6, 'nom_fichier' => 'stihl.jpg', 'url_image' => 'storage/produits/stihl.jpg', 'alt_text' => 'Image STIHL SR 450', 'ordre_affichage' => 0, 'principale' => true]);
-        ProduitImage::updateOrCreate(['id' => 7], ['produit_id' => 7, 'nom_fichier' => 'brouette.jpg', 'url_image' => 'storage/produits/brouette.jpg', 'alt_text' => 'Image Brouette de Chantier', 'ordre_affichage' => 0, 'principale' => true]);
-        ProduitImage::updateOrCreate(['id' => 8], ['produit_id' => 8, 'nom_fichier' => 'machette.jpg', 'url_image' => 'storage/produits/machette.jpg', 'alt_text' => 'Image Machette 22 pouces', 'ordre_affichage' => 0, 'principale' => true]);
-
-        // 5. Seed Tags & Articles de Blog
-        $tag1 = Tag::updateOrCreate(['slug' => 'conseils-agronomiques'], ['nom' => 'Conseils Agronomiques', 'couleur' => '#10B981']);
-        $tag2 = Tag::updateOrCreate(['slug' => 'fertilisation'], ['nom' => 'Fertilisation & Engrais', 'couleur' => '#3B82F6']);
-        $tag3 = Tag::updateOrCreate(['slug' => 'protection-cultures'], ['nom' => 'Protection des Cultures', 'couleur' => '#EF4444']);
-        $tag4 = Tag::updateOrCreate(['slug' => 'irrigation-materiel'], ['nom' => 'Irrigation & Équipements', 'couleur' => '#8B5CF6']);
-
-        $articlesData = [
-            [
-                'slug' => 'guide-complet-utilisation-uree-yara',
-                'titre' => 'Guide complet : Maximiser le rendement du Maïs avec l\'Urée YARA 46%',
-                'extrait' => 'Découvrez le calendrier d\'épandage et les meilleurs dosages par hectare pour éviter les pertes d\'azote.',
-                'contenu' => 'L\'urée YARA 46% N est l\'engrais le plus concentré en azote. Pour maximiser son absorption par le maïs, il est recommandé de fractionner l\'application : un tiers au semis et deux tiers 30 jours après la levée.',
-                'image_principale' => 'images/champ-agricole-bg.jpg',
-                'tag_ids' => [$tag1->id, $tag2->id]
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'atomiseur-stihl-sr-450',
+                'created_at' => '2025-10-07 00:18:06',
+                'updated_at' => '2026-06-05 14:29:41',
             ],
             [
-                'slug' => 'lutter-efficacement-contre-chenille-legionnaire-togo',
-                'titre' => 'Comment protéger vos parcelles contre la Chenille Légionnaire',
-                'extrait' => 'Protégez vos cultures de céréales grâce aux traitements insecticides homologués et aux bonnes pratiques de surveillance.',
-                'contenu' => 'La chenille légionnaire (Spodoptera frugiperda) peut détruire jusqu\'à 70% des récoltes. L\'utilisation préventive de l\'insecticide Katana 50 EC combinée à l\'inspection régulière des cornets de maïs garantit une protection optimale.',
-                'image_principale' => 'images/produits-agroshop-npk-spray-irrigation-mais.png',
-                'tag_ids' => [$tag3->id]
+                'id' => 5,
+                'nom_commercial' => 'Crépine 63&50',
+                'description' => 'Pulvérisateur manuel à dos de 20 litres, conçu pour l\'agriculture et le jardinage. Équipé d\'une pompe à piston en laiton flexible pour éviter les fuites, avec une lance télescopique et des buses ajustables.',
+                'composition' => 'Cuve en plastique jaune résistant (PEHD), pompe manuelle, lance en métal, buses en plastique',
+                'principes_actifs' => 'Remplir la cuve avec la solution, pomper pour pressuriser, ajuster la buse et pulvériser en balayant les zones cibles.',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => 'Porter des gants et un masque lors du remplissage. Éviter les fuites en vérifiant les joints.',
+                'contre_indications' => 'Ne pas utiliser avec des produits inflammables ou toxiques non destinés à ce type d\'équipement.',
+                'prix_unitaire' => 5000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 1000,
+                'stock_alerte' => 10,
+                'poids' => 0.50,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'cr-pine-63-50',
+                'created_at' => '2025-10-07 00:21:39',
+                'updated_at' => '2025-10-07 11:28:29',
             ],
             [
-                'slug' => 'avantages-irrigation-goutte-a-goutte-maraichage',
-                'titre' => 'Irrigation Goutte-à-Goutte : Économisez 50% d\'eau tout en doublant vos récoltes',
-                'extrait' => 'Le guide pratique pour installer un kit d\'irrigation abordable sur une parcelle de maraîchage au Togo.',
-                'contenu' => 'L\'irrigation goutte-à-goutte apporte l\'eau et les nutriments directement au niveau des racines. Elle évite l\'évaporation, réduit les mauvaises herbes et garantit une récolte constante toute l\'année.',
-                'image_principale' => 'images/Agroshop-hero2.png',
-                'tag_ids' => [$tag4->id]
+                'id' => 6,
+                'nom_commercial' => 'Semoir manuel à roue',
+                'description' => 'Outil manuel pour le semis régulier et rapide de graines dans les champs.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 115000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 100000,
+                'stock_alerte' => 10,
+                'poids' => 12.00,
+                'dimensions' => '100 cm x 45 cm x 30 cm',
+                'statut' => 'actif',
+                'featured' => 0,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'semoir-manuel-roue',
+                'created_at' => '2025-10-07 00:22:11',
+                'updated_at' => '2025-10-07 00:22:11',
             ],
             [
-                'slug' => 'choix-outils-quincaillerie-chantier-agricole',
-                'titre' => 'Outillage & Quincaillerie : Choisir son matériel de chantier longue durée',
-                'extrait' => 'Brouettes renforcées, pulvérisateurs et tuyaux : comparatif pour s\'équiper efficacement.',
-                'contenu' => 'Pour des travaux agricoles et de construction durables, le choix de la qualité est essentiel. Les brouettes 90L à cuve renforcée et les pulvérisateurs à dos STIHL garantissent longévité et sécurité sur le terrain.',
-                'image_principale' => 'images/Agroshop-hero3.png',
-                'tag_ids' => [$tag4->id]
-            ]
+                'id' => 7,
+                'nom_commercial' => 'Buses de pulvérisation rouges ajustables',
+                'description' => 'Paire de buses en plastique rouge pour pulvérisateurs agricoles. Modèles coniques avec ajustement de 45 degrés.',
+                'composition' => 'Plastique rouge durable (polypropylène), filetage compatible avec la plupart des lances.',
+                'principes_actifs' => '',
+                'mode_emploi' => 'Vissez sur la lance du pulvérisateur, ajustez l\'angle de pulvérisation.',
+                'dosage_recommande' => '',
+                'precautions_usage' => 'Vérifier la compatibilité du filetage avant montage.',
+                'contre_indications' => 'Non compatible avec des pressions supérieures à 5 bars.',
+                'prix_unitaire' => 6000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 2000,
+                'stock_alerte' => 10,
+                'poids' => 10.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'buses-de-pulv-risateur-rouges-ajustables',
+                'created_at' => '2025-10-07 00:24:25',
+                'updated_at' => '2025-10-07 00:24:25',
+            ],
+            [
+                'id' => 8,
+                'nom_commercial' => 'Souffleur à main EGO 56V – 670 CFM',
+                'description' => 'Cet outil sans fil est idéal pour dégager les feuilles, débris ou poussières dans les exploitations agricoles.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 75000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 100000,
+                'stock_alerte' => 10,
+                'poids' => 4.00,
+                'dimensions' => '90 cm x 20 cm x 25 cm',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'souffleur-main-ego-56v-670-cfm',
+                'created_at' => '2025-10-07 00:25:35',
+                'updated_at' => '2025-10-07 00:25:35',
+            ],
+            [
+                'id' => 9,
+                'nom_commercial' => 'Souffleur de feuilles Greenworks 80V',
+                'description' => 'Souffleur de feuilles sans fil à batterie 80V, avec vitesse max de 170 MPH et débit de 730 CFM. Inclut batterie 2.5Ah et chargeur rapide.',
+                'composition' => 'Corps en plastique noir/vert, moteur brushless, batterie lithium-ion 80V.',
+                'principes_actifs' => '',
+                'mode_emploi' => 'Chargez la batterie, insérez-la, allumez et ajustez la vitesse via la gâchette.',
+                'dosage_recommande' => '',
+                'precautions_usage' => 'Porter des protections auditives et oculaires. Ne pas utiliser sous la pluie.',
+                'contre_indications' => 'Ne pas utiliser pour des matériaux humides ou lourds comme la gravelle.',
+                'prix_unitaire' => 60000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 10000,
+                'stock_alerte' => 10,
+                'poids' => null,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => 'Puissant souffleur de feuilles Greenworks 80V, autonomie 60 min, turbo inclus.',
+                'slug' => 'souffleur-de-feuilles-greenworks-80v',
+                'created_at' => '2025-10-07 00:27:11',
+                'updated_at' => '2025-10-07 11:26:41',
+            ],
+            [
+                'id' => 10,
+                'nom_commercial' => 'EMACOT 050 WG',
+                'description' => 'Insecticide anti-chenilles à large spectre d\'action. Efficace contre les lépidoptères ravageurs des cultures maraîchères et céréalières.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 5000.00,
+                'unite_mesure' => 'kg',
+                'stock_disponible' => 1999995,
+                'stock_alerte' => 10,
+                'poids' => 1.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'emacot-050-wg',
+                'created_at' => '2025-10-07 00:33:25',
+                'updated_at' => '2026-06-23 09:45:12',
+            ],
+            [
+                'id' => 11,
+                'nom_commercial' => 'LDC - Light Duty Cleaner',
+                'description' => 'Nettoyant concentré pour usage léger. Produit de nettoyage domestique pour la vaisselle et surfaces légères.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 10000.00,
+                'unite_mesure' => 'litre',
+                'stock_disponible' => 10000,
+                'stock_alerte' => 10,
+                'poids' => 2.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'ldc-light-duty-cleaner',
+                'created_at' => '2025-10-07 00:38:51',
+                'updated_at' => '2025-10-07 00:39:42',
+            ],
+            [
+                'id' => 12,
+                'nom_commercial' => 'Engrais YaraVita Croplift Bio',
+                'description' => 'Engrais foliaire liquide à base de NPK de haute qualité, enrichi en oligo-éléments essentiels. Stimule la croissance des cultures sous stress.',
+                'composition' => 'N total 8.5% (dont urée 8.5%), B 0.02%, Mn 0.003%, Zn 0.6%, P2O5 3.4%, K2O 6%, Cu 0.1%, Mo 1%.',
+                'principes_actifs' => 'Azote (N), Phosphore (P), Potassium (K), Zinc (Zn), Cuivre (Cu), Molybdène (Mo), Manganèse (Mn), Bore (B).',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 10000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 997,
+                'stock_alerte' => 10,
+                'poids' => 2.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'engrais-yaravita-croplift-bio',
+                'created_at' => '2025-10-07 00:40:00',
+                'updated_at' => '2026-06-27 18:48:45',
+            ],
+            [
+                'id' => 13,
+                'nom_commercial' => 'FERTILIZAA BLOOM 5-30-20',
+                'description' => 'Engrais soluble dans l\'eau spécialement formulé pour la phase de floraison des plantes.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 18000.00,
+                'unite_mesure' => 'kg',
+                'stock_disponible' => 10000,
+                'stock_alerte' => 10,
+                'poids' => 1.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 0,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'fertilizaa-bloom-5-30-20',
+                'created_at' => '2025-10-07 00:47:39',
+                'updated_at' => '2025-10-07 00:47:39',
+            ],
+            [
+                'id' => 14,
+                'nom_commercial' => 'IVORY 80 WP',
+                'description' => 'Fongicide de contact préventif à large spectre pour la protection des cultures maraîchères contre les maladies fongiques.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 10000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 9999,
+                'stock_alerte' => 10,
+                'poids' => 1.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 0,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'ivory-80-wp',
+                'created_at' => '2025-10-07 00:49:51',
+                'updated_at' => '2026-02-18 17:23:46',
+            ],
+            [
+                'id' => 15,
+                'nom_commercial' => 'WYNCA SUNPYRIFOS 48% EC',
+                'description' => 'Insecticide à large spectre d\'action contre les ravageurs des cultures agricoles, horticoles et de santé publique.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 1500.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 500,
+                'stock_alerte' => 10,
+                'poids' => null,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 0,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'wynca-sunpyrifos-48-ec',
+                'created_at' => '2025-10-07 00:55:16',
+                'updated_at' => '2025-10-07 00:55:16',
+            ],
+            [
+                'id' => 16,
+                'nom_commercial' => 'SEMENCES DE TOMATE',
+                'description' => 'Semences de tomate conditionnées en boîte métallique hermétique pour une conservation optimale.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 38000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 10000,
+                'stock_alerte' => 10,
+                'poids' => 1.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 0,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'semences-de-tomate',
+                'created_at' => '2025-10-07 11:10:57',
+                'updated_at' => '2025-10-07 11:10:57',
+            ],
+            [
+                'id' => 17,
+                'nom_commercial' => 'POMPE CENTRIFUGE HAPPY®',
+                'description' => 'Pompe centrifuge électrique professionnelle pour irrigation agricole, alimentation en eau et applications industrielles.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 95000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 1000,
+                'stock_alerte' => 10,
+                'poids' => 10.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 0,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'pompe-centrifuge-happy',
+                'created_at' => '2025-10-07 11:15:41',
+                'updated_at' => '2025-10-07 11:15:41',
+            ],
+            [
+                'id' => 18,
+                'nom_commercial' => 'YARA YARAVERA',
+                'description' => 'Engrais azoté enrichi au zinc. Combine l\'urée (46% N) avec du zinc pour corriger simultanément les carences en azote et en zinc.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 28000.00,
+                'unite_mesure' => 'kg',
+                'stock_disponible' => 100000,
+                'stock_alerte' => 10,
+                'poids' => 50.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 0,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'yara-yaravera',
+                'created_at' => '2025-10-07 11:18:19',
+                'updated_at' => '2025-10-07 11:18:19',
+            ],
+            [
+                'id' => 19,
+                'nom_commercial' => 'PULVÉRISATEUR À DOS AGROSHOP',
+                'description' => 'Pulvérisateur manuel à pression préalable pour application de pesticides, herbicides, fongicides et engrais foliaires.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 15000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 1000,
+                'stock_alerte' => 10,
+                'poids' => 10.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'pulv-risateur-dos-agroshop',
+                'created_at' => '2025-10-07 11:20:49',
+                'updated_at' => '2025-10-07 11:20:49',
+            ],
+            [
+                'id' => 20,
+                'nom_commercial' => 'TUYAUX PVC BLANC',
+                'description' => 'Tuyaux en PVC rigide de différents diamètres pour systèmes d\'irrigation, plomberie agricole, drainage et distribution d\'eau.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 1500.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 10000,
+                'stock_alerte' => 10,
+                'poids' => 7.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'tuyaux-pvc-blanc',
+                'created_at' => '2025-10-07 11:25:06',
+                'updated_at' => '2025-10-07 11:25:06',
+            ],
+            [
+                'id' => 21,
+                'nom_commercial' => 'TUYAUX PPR',
+                'description' => 'Tuyaux en polypropylène random copolymère pour installations d\'eau chaude et froide.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 1500.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 1000000,
+                'stock_alerte' => 10,
+                'poids' => null,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'tuyaux-ppr',
+                'created_at' => '2025-10-07 11:33:12',
+                'updated_at' => '2025-10-07 11:33:12',
+            ],
+            [
+                'id' => 22,
+                'nom_commercial' => 'YARA YARALIVA™ NITRABOR',
+                'description' => 'Engrais soluble enrichi en calcium et bore, spécialement formulé pour corriger les carences en calcium et bore tout en apportant de l\'azote nitrique.',
+                'composition' => '',
+                'principes_actifs' => '',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '',
+                'contre_indications' => '',
+                'prix_unitaire' => 28000.00,
+                'unite_mesure' => 'kg',
+                'stock_disponible' => 9999,
+                'stock_alerte' => 10,
+                'poids' => 50.00,
+                'dimensions' => '',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'yara-yaraliva-nitrabor',
+                'created_at' => '2025-10-07 11:35:11',
+                'updated_at' => '2026-05-12 16:52:50',
+            ],
+            [
+                'id' => 23,
+                'nom_commercial' => 'Panneau solaire monocristallin 300W',
+                'description' => 'Panneau solaire haute performance conçu pour la production d’énergie électrique à partir du rayonnement solaire.',
+                'composition' => '',
+                'principes_actifs' => 'Transformation du rayonnement solaire en énergie électrique via l’effet photovoltaïque.',
+                'mode_emploi' => '',
+                'dosage_recommande' => '',
+                'precautions_usage' => '⚠️ Précautions d’usage: Ne pas marcher sur le panneau. Éviter tout court-circuit. Manipuler avec soin.',
+                'contre_indications' => '',
+                'prix_unitaire' => 210000.00,
+                'unite_mesure' => 'unité',
+                'stock_disponible' => 1000,
+                'stock_alerte' => 10,
+                'poids' => 18.00,
+                'dimensions' => '165 cm x 99 cm x 3,5 cm',
+                'statut' => 'actif',
+                'featured' => 1,
+                'meta_title' => '',
+                'meta_description' => '',
+                'slug' => 'panneau-solaire-monocristallin-300w',
+                'created_at' => '2025-10-22 07:43:01',
+                'updated_at' => '2025-10-22 07:43:01',
+            ],
         ];
 
-        foreach ($articlesData as $artData) {
-            $article = ArticleBlog::updateOrCreate(
-                ['slug' => $artData['slug']],
-                [
-                    'titre' => $artData['titre'],
-                    'contenu' => $artData['contenu'],
-                    'extrait' => $artData['extrait'],
-                    'statut' => 'publie',
-                    'auteur_id' => $admin1->id,
-                    'image_principale' => $artData['image_principale'],
-                    'meta_title' => $artData['titre'] . ' - AgroShop',
-                    'meta_description' => $artData['extrait'],
-                    'date_publication' => now(),
-                    'vues' => rand(15, 120),
-                ]
-            );
-            $article->tags()->syncWithoutDetaching($artData['tag_ids']);
+        foreach ($produits as $prod) {
+            DB::table('produits')->updateOrInsert(['id' => $prod['id']], $prod);
         }
 
-        // 6. Seed Documents Fiches Techniques & Guides
-        ProduitDocument::updateOrCreate(
-            ['id' => 1],
-            [
-                'produit_id' => 1,
-                'nom_document' => 'Fiche Technique - Urée YARA 46%',
-                'type_document' => 'fiche_technique',
-                'url_document' => 'storage/documents/ft_urea_yara.pdf',
-                'taille_fichier' => 1024000,
-            ]
-        );
+        // 5. Seed Produit Categories Pivot
+        $produitCategories = [
+            ['id' => 2, 'produit_id' => 2, 'categorie_id' => 4, 'principale' => 1, 'created_at' => '2025-10-07 00:00:33'],
+            ['id' => 3, 'produit_id' => 1, 'categorie_id' => 8, 'principale' => 1, 'created_at' => '2025-10-07 00:08:27'],
+            ['id' => 4, 'produit_id' => 3, 'categorie_id' => 3, 'principale' => 1, 'created_at' => '2025-10-07 00:11:41'],
+            ['id' => 6, 'produit_id' => 4, 'categorie_id' => 5, 'principale' => 1, 'created_at' => '2025-10-07 00:19:22'],
+            ['id' => 8, 'produit_id' => 6, 'categorie_id' => 5, 'principale' => 1, 'created_at' => '2025-10-07 00:22:11'],
+            ['id' => 9, 'produit_id' => 7, 'categorie_id' => 5, 'principale' => 1, 'created_at' => '2025-10-07 00:24:25'],
+            ['id' => 10, 'produit_id' => 8, 'categorie_id' => 5, 'principale' => 1, 'created_at' => '2025-10-07 00:25:35'],
+            ['id' => 13, 'produit_id' => 10, 'categorie_id' => 1, 'principale' => 0, 'created_at' => '2025-10-07 00:33:25'],
+            ['id' => 14, 'produit_id' => 10, 'categorie_id' => 2, 'principale' => 0, 'created_at' => '2025-10-07 00:33:25'],
+            ['id' => 15, 'produit_id' => 10, 'categorie_id' => 10, 'principale' => 0, 'created_at' => '2025-10-07 00:33:25'],
+            ['id' => 20, 'produit_id' => 11, 'categorie_id' => 6, 'principale' => 0, 'created_at' => '2025-10-07 00:39:42'],
+            ['id' => 21, 'produit_id' => 12, 'categorie_id' => 9, 'principale' => 1, 'created_at' => '2025-10-07 00:40:00'],
+            ['id' => 22, 'produit_id' => 13, 'categorie_id' => 1, 'principale' => 1, 'created_at' => '2025-10-07 00:47:39'],
+            ['id' => 23, 'produit_id' => 14, 'categorie_id' => 1, 'principale' => 1, 'created_at' => '2025-10-07 00:49:51'],
+            ['id' => 24, 'produit_id' => 16, 'categorie_id' => 1, 'principale' => 0, 'created_at' => '2025-10-07 11:10:57'],
+            ['id' => 25, 'produit_id' => 16, 'categorie_id' => 4, 'principale' => 1, 'created_at' => '2025-10-07 11:10:57'],
+            ['id' => 26, 'produit_id' => 17, 'categorie_id' => 3, 'principale' => 1, 'created_at' => '2025-10-07 11:15:41'],
+            ['id' => 27, 'produit_id' => 17, 'categorie_id' => 5, 'principale' => 0, 'created_at' => '2025-10-07 11:15:41'],
+            ['id' => 28, 'produit_id' => 18, 'categorie_id' => 1, 'principale' => 1, 'created_at' => '2025-10-07 11:18:19'],
+            ['id' => 29, 'produit_id' => 19, 'categorie_id' => 5, 'principale' => 1, 'created_at' => '2025-10-07 11:20:49'],
+            ['id' => 30, 'produit_id' => 20, 'categorie_id' => 3, 'principale' => 1, 'created_at' => '2025-10-07 11:25:06'],
+            ['id' => 31, 'produit_id' => 9, 'categorie_id' => 5, 'principale' => 1, 'created_at' => '2025-10-07 11:26:41'],
+            ['id' => 32, 'produit_id' => 5, 'categorie_id' => 3, 'principale' => 1, 'created_at' => '2025-10-07 11:28:29'],
+            ['id' => 33, 'produit_id' => 21, 'categorie_id' => 3, 'principale' => 1, 'created_at' => '2025-10-07 11:33:12'],
+            ['id' => 35, 'produit_id' => 22, 'categorie_id' => 1, 'principale' => 1, 'created_at' => '2025-10-07 11:36:52'],
+            ['id' => 36, 'produit_id' => 23, 'categorie_id' => 5, 'principale' => 1, 'created_at' => '2025-10-22 07:43:01'],
+        ];
 
-        ProduitDocument::updateOrCreate(
-            ['id' => 2],
-            [
-                'produit_id' => 3,
-                'nom_document' => 'Guide de Sécurité & Dosage - Katana 50 EC',
-                'type_document' => 'guide_utilisation',
-                'url_document' => 'storage/documents/guide_katana_50ec.pdf',
-                'taille_fichier' => 512000,
-            ]
-        );
+        foreach ($produitCategories as $pc) {
+            DB::table('produit_categories')->updateOrInsert(['id' => $pc['id']], $pc);
+        }
 
-        ProduitDocument::updateOrCreate(
-            ['id' => 3],
-            [
-                'produit_id' => 6,
-                'nom_document' => 'Manuel Utilisateur STIHL SR 450',
-                'type_document' => 'guide_utilisation',
-                'url_document' => 'storage/documents/manuel_stihl_sr450.pdf',
-                'taille_fichier' => 2048000,
-            ]
-        );
+        // 6. Seed Produit Images
+        $produitImages = [
+            ['id' => 1, 'produit_id' => 1, 'nom_fichier' => 'img_68505f1783ce7.jpg', 'url_image' => 'uploads/produits/img_68e45768479f2.jpg', 'alt_text' => 'Image de Urée YARA', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-06 23:57:28'],
+            ['id' => 2, 'produit_id' => 2, 'nom_fichier' => 'img_68505f9e59f65.jpg', 'url_image' => 'uploads/produits/img_68e4582133a2b.jpg', 'alt_text' => 'Image de Betterave BORO F1', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:00:33'],
+            ['id' => 3, 'produit_id' => 3, 'nom_fichier' => 'img_68505bfc2230b.jpg', 'url_image' => 'uploads/produits/img_68e45abdef8ef.jpg', 'alt_text' => 'Image de Lance de pulvérisateur agricole', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:11:41'],
+            ['id' => 4, 'produit_id' => 4, 'nom_fichier' => 'Pulvérisateur à dos motorisé STIHL.jpg', 'url_image' => 'uploads/produits/img_68e45c3e28e6e.jpg', 'alt_text' => 'Image de Atomiseur STIHL SR 450', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:18:06'],
+            ['id' => 5, 'produit_id' => 5, 'nom_fichier' => 'img_68522bfcb87c6.jpg', 'url_image' => 'uploads/produits/img_68e45d13b462d.jpg', 'alt_text' => 'Image de Pulvérisateur à dos Agroshop 20L', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:21:39'],
+            ['id' => 6, 'produit_id' => 6, 'nom_fichier' => 'Semoir manuel.jpg', 'url_image' => 'uploads/produits/img_68e45d33cc65e.jpg', 'alt_text' => 'Image de Semoir manuel à roue', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:22:11'],
+            ['id' => 7, 'produit_id' => 7, 'nom_fichier' => 'img_68534ebe3ec80.jpg', 'url_image' => 'uploads/produits/img_68e45db9b7d8c.jpg', 'alt_text' => 'Image de Buses de pulvérisation rouges ajustables', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:24:25'],
+            ['id' => 8, 'produit_id' => 8, 'nom_fichier' => 'Souffleur à main EGO.jpg', 'url_image' => 'uploads/produits/img_68e45dffbe10c.jpg', 'alt_text' => 'Image de Souffleur à main EGO 56V – 670 CFM', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:25:35'],
+            ['id' => 10, 'produit_id' => 10, 'nom_fichier' => 'EMACOT 050 WG.jpg', 'url_image' => 'uploads/produits/img_68e45fd506880.jpg', 'alt_text' => 'Image de EMACOT 050 WG', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:33:25'],
+            ['id' => 12, 'produit_id' => 9, 'nom_fichier' => 'img_68534ebe3e9ab.jpg', 'url_image' => 'Uploads/produits/img_68e460c161cb2.jpg', 'alt_text' => 'Image de YARA Souffleur de feuilles Greenworks 80V', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:37:21'],
+            ['id' => 13, 'produit_id' => 11, 'nom_fichier' => 'IMG-20250529-WA0137.jpg', 'url_image' => 'uploads/produits/img_68e4611b93675.jpg', 'alt_text' => 'Image de LDC - Light Duty Cleaner', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:38:51'],
+            ['id' => 14, 'produit_id' => 12, 'nom_fichier' => 'img_68522d4496f51.jpg', 'url_image' => 'uploads/produits/img_68e461603d754.jpg', 'alt_text' => 'Image de Engrais YaraVita Croplift Bio', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:40:00'],
+            ['id' => 15, 'produit_id' => 13, 'nom_fichier' => 'Fertilizaa.jpg', 'url_image' => 'uploads/produits/img_68e4632b4496c.jpg', 'alt_text' => 'Image de FERTILIZAA BLOOM 5-30-20', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:47:39'],
+            ['id' => 16, 'produit_id' => 14, 'nom_fichier' => 'IVORY 80 WP.jpg', 'url_image' => 'uploads/produits/img_68e463afc8b0e.jpg', 'alt_text' => 'Image de IVORY 80 WP', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:49:51'],
+            ['id' => 17, 'produit_id' => 15, 'nom_fichier' => 'SUNPYRIFOS 48% EC.jpg', 'url_image' => 'Uploads/produits/img_68e4656baa76c.jpg', 'alt_text' => 'Image de WYNCA SUNPYRIFOS 48% EC', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:57:15'],
+            ['id' => 18, 'produit_id' => 16, 'nom_fichier' => 'Tomate.jpg', 'url_image' => 'uploads/produits/img_68e4f5413e207.jpg', 'alt_text' => 'Image de SEMENCES DE TOMATE', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:10:57'],
+            ['id' => 19, 'produit_id' => 17, 'nom_fichier' => 'IMG-20250529-WA0140.jpg', 'url_image' => 'uploads/produits/img_68e4f65da875f.jpg', 'alt_text' => 'Image de POMPE CENTRIFUGE HAPPY®', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:15:41'],
+            ['id' => 20, 'produit_id' => 17, 'nom_fichier' => 'IMG-20250529-WA0159.jpg', 'url_image' => 'uploads/produits/img_68e4f65da8a7f.jpg', 'alt_text' => 'Image de POMPE CENTRIFUGE HAPPY®', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-07 11:15:41'],
+            ['id' => 21, 'produit_id' => 17, 'nom_fichier' => 'IMG-20250529-WA0162.jpg', 'url_image' => 'uploads/produits/img_68e4f65da8bd7.jpg', 'alt_text' => 'Image de POMPE CENTRIFUGE HAPPY®', 'ordre_affichage' => 2, 'principale' => 0, 'created_at' => '2025-10-07 11:15:41'],
+            ['id' => 22, 'produit_id' => 18, 'nom_fichier' => 'IMG-20250529-WA0144.jpg', 'url_image' => 'uploads/produits/img_68e4f6fb58058.jpg', 'alt_text' => 'Image de YARA YARAVERA', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:18:19'],
+            ['id' => 23, 'produit_id' => 19, 'nom_fichier' => 'IMG-20250529-WA0164.jpg', 'url_image' => 'uploads/produits/img_68e4f791c791c.jpg', 'alt_text' => 'Image de PULVÉRISATEUR À DOS AGROSHOP', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:20:49'],
+            ['id' => 24, 'produit_id' => 19, 'nom_fichier' => 'Pulvérisateur Agroshop.jpg', 'url_image' => 'uploads/produits/img_68e4f791c7e69.jpg', 'alt_text' => 'Image de PULVÉRISATEUR À DOS AGROSHOP', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-07 11:20:49'],
+            ['id' => 25, 'produit_id' => 19, 'nom_fichier' => 'Pulvérisateur.jpg', 'url_image' => 'uploads/produits/img_68e4f791c7f84.jpg', 'alt_text' => 'Image de PULVÉRISATEUR À DOS AGROSHOP', 'ordre_affichage' => 2, 'principale' => 0, 'created_at' => '2025-10-07 11:20:49'],
+            ['id' => 26, 'produit_id' => 20, 'nom_fichier' => 'IMG-20250529-WA0131.jpg', 'url_image' => 'uploads/produits/img_68e4f89249f85.jpg', 'alt_text' => 'Image de TUYAUX PVC BLANC', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:25:06'],
+            ['id' => 27, 'produit_id' => 20, 'nom_fichier' => 'tuyaux pvc.jpg', 'url_image' => 'uploads/produits/img_68e4f8924a5d8.jpg', 'alt_text' => 'Image de TUYAUX PVC BLANC', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-07 11:25:06'],
+            ['id' => 28, 'produit_id' => 21, 'nom_fichier' => 'tuyaux.jpg', 'url_image' => 'uploads/produits/img_68e4fa786df2c.jpg', 'alt_text' => 'Image de TUYAUX PPR', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:33:12'],
+            ['id' => 29, 'produit_id' => 22, 'nom_fichier' => 'YaraLiva NITRABOR (Engrais).jpg', 'url_image' => 'Uploads/produits/img_68e4fb545de98.jpg', 'alt_text' => 'Image de YARA YARALIVA™ NITRABOR', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:36:52'],
+            ['id' => 30, 'produit_id' => 23, 'nom_fichier' => 'IMG_6044.JPG', 'url_image' => 'uploads/produits/img_68f88b051d675.jpg', 'alt_text' => 'Image de Panneau solaire monocristallin 300W', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-22 07:43:01'],
+            ['id' => 31, 'produit_id' => 23, 'nom_fichier' => 'IMG_6045.JPG', 'url_image' => 'uploads/produits/img_68f88b051dba3.jpg', 'alt_text' => 'Image de Panneau solaire monocristallin 300W', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-22 07:43:01'],
+            ['id' => 32, 'produit_id' => 23, 'nom_fichier' => 'IMG_6046.JPG', 'url_image' => 'uploads/produits/img_68f88b051dd0e.jpg', 'alt_text' => 'Image de Panneau solaire monocristallin 300W', 'ordre_affichage' => 2, 'principale' => 0, 'created_at' => '2025-10-22 07:43:01'],
+        ];
 
-        // 7. Seed Exemples de Commandes de Test
-        $commande1 = Commande::updateOrCreate(
-            ['code_reference' => 'CMD-2026-0001'],
-            [
-                'nom_client' => 'KOFFI',
-                'prenom_client' => 'Ablam',
-                'telephone' => '+22890123456',
-                'email' => 'ablam.koffi@example.com',
-                'adresse_ligne1' => 'Quartier Tokoin',
-                'ville' => 'Lomé',
-                'pays' => 'Togo',
-                'montant_ht' => 45000.00,
-                'montant_tva' => 8100.00,
-                'montant_ttc' => 53100.00,
-                'frais_livraison' => 5000.00,
-                'montant_total' => 58100.00,
-                'type_livraison' => 'livraison',
-                'adresse_livraison' => 'Ferme maraîchère, Tokoin Lomé',
-                'statut_commande' => 'confirmee',
-                'statut_paiement' => 'paye',
-                'commentaire' => 'Livrer en début de matinée s\'il vous plaît.',
-            ]
-        );
+        foreach ($produitImages as $pi) {
+            DB::table('produit_images')->updateOrInsert(['id' => $pi['id']], $pi);
+        }
 
-        CommandeArticle::updateOrCreate(
-            ['id' => 1],
-            [
-                'commande_id' => $commande1->id,
-                'produit_id' => 1,
-                'nom_produit' => 'Urée YARA 46% N',
-                'prix_unitaire' => 15000.00,
-                'quantite' => 2,
-                'montant_ligne' => 30000.00,
-            ]
-        );
+        // 7. Seed Commandes
+        $commandes = [
+            ['id' => 1, 'code_reference' => 'AGR2025000001', 'nom_client' => 'sewoda', 'prenom_client' => 'Admin', 'telephone' => '90909090', 'email' => 'demo@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 515000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 515000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'en_attente', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => '', 'ip_client' => '102.64.168.118', 'user_agent' => null, 'created_at' => '2025-10-07 12:32:25', 'updated_at' => '2025-10-07 12:32:25'],
+            ['id' => 2, 'code_reference' => 'AGR2025000002', 'nom_client' => 'deded', 'prenom_client' => 'ded', 'telephone' => '744323232', 'email' => '', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 8000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 8000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'en_attente', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => '', 'ip_client' => '154.125.182.14', 'user_agent' => null, 'created_at' => '2025-11-30 21:13:17', 'updated_at' => '2025-11-30 21:13:17'],
+            ['id' => 3, 'code_reference' => 'AGR2026000003', 'nom_client' => 'KAMAZINA', 'prenom_client' => 'Komlan Réné', 'telephone' => '93118417', 'email' => 'renekamazina@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 10000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 10000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'en_attente', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => '', 'ip_client' => '41.78.136.117', 'user_agent' => null, 'created_at' => '2026-02-18 17:23:46', 'updated_at' => '2026-02-18 17:23:46'],
+            ['id' => 4, 'code_reference' => 'AGR2026000004', 'nom_client' => 'AGBEDEVI', 'prenom_client' => 'KODJO ROGER TELESPHE', 'telephone' => '91658745', 'email' => 'helpino33@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 15000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 15000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'en_attente', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => '', 'ip_client' => '160.120.162.213', 'user_agent' => null, 'created_at' => '2026-02-18 18:02:11', 'updated_at' => '2026-02-18 18:02:11'],
+            ['id' => 5, 'code_reference' => 'AGR2026000005', 'nom_client' => 'MENSAH', 'prenom_client' => 'Kangni', 'telephone' => '92208571', 'email' => 'Kangnimensah083@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 10000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 10000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'confirmee', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => 'Recherche d\' engrais npk et urée aussi à payer', 'ip_client' => '102.64.161.242', 'user_agent' => null, 'created_at' => '2026-03-08 12:17:07', 'updated_at' => '2026-04-08 07:23:57'],
+            ['id' => 6, 'code_reference' => 'AGR2026000006', 'nom_client' => 'NOVATECH SERVICES', 'prenom_client' => 'SARL', 'telephone' => '96155689', 'email' => 'novatechservicestg@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 28000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 28000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'confirmee', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => 'La livraison est possible où', 'ip_client' => '102.64.145.89', 'user_agent' => null, 'created_at' => '2026-05-12 16:52:50', 'updated_at' => '2026-05-31 01:38:56'],
+            ['id' => 7, 'code_reference' => 'AGR2026000007', 'nom_client' => 'KPODAR', 'prenom_client' => 'Adama', 'telephone' => '90051112', 'email' => 'kpodar62@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 5000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 5000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'confirmee', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => '', 'ip_client' => '152.228.175.227', 'user_agent' => null, 'created_at' => '2026-05-16 10:46:33', 'updated_at' => '2026-05-31 01:38:30'],
+            ['id' => 8, 'code_reference' => 'AGR2026000008', 'nom_client' => 'KPODAR', 'prenom_client' => 'Eric', 'telephone' => '90051112', 'email' => 'kpodar62@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 10000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 10000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'confirmee', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => '', 'ip_client' => '196.169.19.67', 'user_agent' => null, 'created_at' => '2026-05-29 09:32:00', 'updated_at' => '2026-05-31 01:38:13'],
+            ['id' => 9, 'code_reference' => 'AGR2026000009', 'nom_client' => 'DOUMNAIBEI', 'prenom_client' => 'MASRA', 'telephone' => '92198186', 'email' => 'masraguill@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 4000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 4000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'en_attente', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => '', 'ip_client' => '102.64.172.66', 'user_agent' => null, 'created_at' => '2026-06-02 01:12:18', 'updated_at' => '2026-06-02 01:12:18'],
+            ['id' => 10, 'code_reference' => 'AGR2026000010', 'nom_client' => 'Amanda', 'prenom_client' => 'Corsini', 'telephone' => '002283696352580', 'email' => 'amandacorsini@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 515000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 515000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'en_attente', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => '', 'ip_client' => '41.85.162.148', 'user_agent' => null, 'created_at' => '2026-06-05 14:29:41', 'updated_at' => '2026-06-05 14:29:41'],
+            ['id' => 11, 'code_reference' => 'AGR2026000011', 'nom_client' => 'le senechal', 'prenom_client' => 'eric', 'telephone' => '70642525', 'email' => 'lesenechalcongo@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 5000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 5000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'en_attente', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => '', 'ip_client' => '102.64.218.148', 'user_agent' => null, 'created_at' => '2026-06-23 09:45:12', 'updated_at' => '2026-06-23 09:45:12'],
+            ['id' => 12, 'code_reference' => 'AGR2026000012', 'nom_client' => 'Loulou', 'prenom_client' => 'Dupont', 'telephone' => '0658665639', 'email' => 'louloudupont@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 10000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 10000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'en_attente', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => 'Merci', 'ip_client' => '81.220.52.81', 'user_agent' => null, 'created_at' => '2026-06-27 18:48:45', 'updated_at' => '2026-06-27 18:48:45'],
+            ['id' => 13, 'code_reference' => 'AGR2026000013', 'nom_client' => 'test', 'prenom_client' => 'test', 'telephone' => '99000102', 'email' => 'test@gmail.com', 'adresse_ligne1' => null, 'adresse_ligne2' => null, 'ville' => null, 'code_postal' => null, 'pays' => 'Togo', 'montant_ht' => 4000.00, 'montant_tva' => 0.00, 'montant_ttc' => 0.00, 'frais_livraison' => 0.00, 'montant_total' => 4000.00, 'type_livraison' => 'livraison', 'adresse_livraison' => '', 'date_livraison_souhaitee' => null, 'instructions_livraison' => null, 'statut_commande' => 'en_attente', 'statut_paiement' => 'en_attente', 'notes_admin' => null, 'commentaire' => 'test', 'ip_client' => '102.64.222.214', 'user_agent' => null, 'created_at' => '2026-07-14 15:06:30', 'updated_at' => '2026-07-14 15:06:30'],
+        ];
 
-        CommandeArticle::updateOrCreate(
-            ['id' => 2],
-            [
-                'commande_id' => $commande1->id,
-                'produit_id' => 2,
-                'nom_produit' => 'Engrais NPK 15-15-15 SuperFert',
-                'prix_unitaire' => 15000.00,
-                'quantite' => 1,
-                'montant_ligne' => 15000.00,
-            ]
-        );
+        foreach ($commandes as $cmd) {
+            DB::table('commandes')->updateOrInsert(['id' => $cmd['id']], $cmd);
+        }
 
-        CommandeSuivi::updateOrCreate(
-            ['id' => 1],
-            [
-                'commande_id' => $commande1->id,
-                'statut_precedent' => 'en_attente',
-                'nouveau_statut' => 'confirmee',
-                'commentaire' => 'Commande validée après paiement Mobile Money.',
-                'utilisateur_id' => $admin1->id,
-            ]
-        );
+        // 8. Seed Commande Articles
+        $commandeArticles = [
+            ['id' => 1, 'commande_id' => 1, 'produit_id' => 4, 'nom_produit' => 'Atomiseur STIHL SR 450', 'prix_unitaire' => 515000.00, 'quantite' => 1, 'montant_ligne' => 515000.00],
+            ['id' => 2, 'commande_id' => 2, 'produit_id' => 2, 'nom_produit' => 'Betterave BORO F1', 'prix_unitaire' => 4000.00, 'quantite' => 2, 'montant_ligne' => 8000.00],
+            ['id' => 3, 'commande_id' => 3, 'produit_id' => 14, 'nom_produit' => 'IVORY 80 WP', 'prix_unitaire' => 10000.00, 'quantite' => 1, 'montant_ligne' => 10000.00],
+            ['id' => 4, 'commande_id' => 4, 'produit_id' => 12, 'nom_produit' => 'Engrais YaraVita Croplift Bio', 'prix_unitaire' => 10000.00, 'quantite' => 1, 'montant_ligne' => 10000.00],
+            ['id' => 5, 'commande_id' => 4, 'produit_id' => 10, 'nom_produit' => 'EMACOT 050 WG', 'prix_unitaire' => 5000.00, 'quantite' => 1, 'montant_ligne' => 5000.00],
+            ['id' => 6, 'commande_id' => 5, 'produit_id' => 12, 'nom_produit' => 'Engrais YaraVita Croplift Bio', 'prix_unitaire' => 10000.00, 'quantite' => 1, 'montant_ligne' => 10000.00],
+            ['id' => 7, 'commande_id' => 6, 'produit_id' => 22, 'nom_produit' => 'YARA YARALIVA™ NITRABOR', 'prix_unitaire' => 28000.00, 'quantite' => 1, 'montant_ligne' => 28000.00],
+            ['id' => 8, 'commande_id' => 7, 'produit_id' => 10, 'nom_produit' => 'EMACOT 050 WG', 'prix_unitaire' => 5000.00, 'quantite' => 1, 'montant_ligne' => 5000.00],
+            ['id' => 9, 'commande_id' => 8, 'produit_id' => 10, 'nom_produit' => 'EMACOT 050 WG', 'prix_unitaire' => 5000.00, 'quantite' => 2, 'montant_ligne' => 10000.00],
+            ['id' => 10, 'commande_id' => 9, 'produit_id' => 2, 'nom_produit' => 'Betterave BORO F1', 'prix_unitaire' => 4000.00, 'quantite' => 1, 'montant_ligne' => 4000.00],
+            ['id' => 11, 'commande_id' => 10, 'produit_id' => 4, 'nom_produit' => 'Atomiseur STIHL SR 450', 'prix_unitaire' => 515000.00, 'quantite' => 1, 'montant_ligne' => 515000.00],
+            ['id' => 12, 'commande_id' => 11, 'produit_id' => 10, 'nom_produit' => 'EMACOT 050 WG', 'prix_unitaire' => 5000.00, 'quantite' => 1, 'montant_ligne' => 5000.00],
+            ['id' => 13, 'commande_id' => 12, 'produit_id' => 12, 'nom_produit' => 'Engrais YaraVita Croplift Bio', 'prix_unitaire' => 10000.00, 'quantite' => 1, 'montant_ligne' => 10000.00],
+            ['id' => 14, 'commande_id' => 13, 'produit_id' => 2, 'nom_produit' => 'Betterave BORO F1', 'prix_unitaire' => 4000.00, 'quantite' => 1, 'montant_ligne' => 4000.00],
+        ];
 
-        $commande2 = Commande::updateOrCreate(
-            ['code_reference' => 'CMD-2026-0002'],
-            [
-                'nom_client' => 'LAWSON',
-                'prenom_client' => 'Jean-Marc',
-                'telephone' => '+22891987654',
-                'email' => 'jm.lawson@example.com',
-                'adresse_ligne1' => 'Grand Marché',
-                'ville' => 'Tsévié',
-                'pays' => 'Togo',
-                'montant_ht' => 117000.00,
-                'montant_tva' => 21060.00,
-                'montant_ttc' => 138060.00,
-                'frais_livraison' => 0.00,
-                'montant_total' => 138060.00,
-                'type_livraison' => 'retrait_agence',
-                'statut_commande' => 'livree',
-                'statut_paiement' => 'paye',
-                'commentaire' => 'Retrait à l\'agence de Tsévié.',
-            ]
-        );
+        foreach ($commandeArticles as $ca) {
+            DB::table('commande_articles')->updateOrInsert(['id' => $ca['id']], $ca);
+        }
 
-        CommandeArticle::updateOrCreate(
-            ['id' => 3],
-            [
-                'commande_id' => $commande2->id,
-                'produit_id' => 5,
-                'nom_produit' => 'Kit d\'Irrigation Goutte-à-Goutte 500m²',
-                'prix_unitaire' => 85000.00,
-                'quantite' => 1,
-                'montant_ligne' => 85000.00,
-            ]
-        );
+        // 9. Seed Commande Suivis
+        $commandeSuivis = [
+            ['id' => 1, 'commande_id' => 1, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2025-10-07 12:32:25'],
+            ['id' => 2, 'commande_id' => 2, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2025-11-30 21:13:17'],
+            ['id' => 3, 'commande_id' => 3, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-02-18 17:23:46'],
+            ['id' => 4, 'commande_id' => 4, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-02-18 18:02:11'],
+            ['id' => 5, 'commande_id' => 5, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-03-08 12:17:07'],
+            ['id' => 6, 'commande_id' => 5, 'statut_precedent' => 'en_attente', 'nouveau_statut' => 'confirmee', 'commentaire' => 'Changement automatique de statut', 'utilisateur_id' => null, 'created_at' => '2026-04-08 07:23:57'],
+            ['id' => 7, 'commande_id' => 6, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-05-12 16:52:50'],
+            ['id' => 8, 'commande_id' => 7, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-05-16 10:46:33'],
+            ['id' => 9, 'commande_id' => 8, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-05-29 09:32:00'],
+            ['id' => 10, 'commande_id' => 8, 'statut_precedent' => 'en_attente', 'nouveau_statut' => 'confirmee', 'commentaire' => 'Changement automatique de statut', 'utilisateur_id' => null, 'created_at' => '2026-05-31 01:38:13'],
+            ['id' => 11, 'commande_id' => 7, 'statut_precedent' => 'en_attente', 'nouveau_statut' => 'confirmee', 'commentaire' => 'Changement automatique de statut', 'utilisateur_id' => null, 'created_at' => '2026-05-31 01:38:30'],
+            ['id' => 12, 'commande_id' => 6, 'statut_precedent' => 'en_attente', 'nouveau_statut' => 'confirmee', 'commentaire' => 'Changement automatique de statut', 'utilisateur_id' => null, 'created_at' => '2026-05-31 01:38:56'],
+            ['id' => 13, 'commande_id' => 9, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-06-02 01:12:18'],
+            ['id' => 14, 'commande_id' => 10, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-06-05 14:29:41'],
+            ['id' => 15, 'commande_id' => 11, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-06-23 09:45:12'],
+            ['id' => 16, 'commande_id' => 12, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-06-27 18:48:45'],
+            ['id' => 17, 'commande_id' => 13, 'statut_precedent' => null, 'nouveau_statut' => 'en_attente', 'commentaire' => 'Commande créée', 'utilisateur_id' => null, 'created_at' => '2026-07-14 15:06:30'],
+        ];
 
-        CommandeArticle::updateOrCreate(
-            ['id' => 4],
-            [
-                'commande_id' => $commande2->id,
-                'produit_id' => 7,
-                'nom_produit' => 'Brouette de Chantier Renforcée 90L',
-                'prix_unitaire' => 32000.00,
-                'quantite' => 1,
-                'montant_ligne' => 32000.00,
-            ]
-        );
+        foreach ($commandeSuivis as $cs) {
+            DB::table('commande_suivis')->updateOrInsert(['id' => $cs['id']], $cs);
+        }
 
-        CommandeSuivi::updateOrCreate(
-            ['id' => 2],
-            [
-                'commande_id' => $commande2->id,
-                'statut_precedent' => 'en_attente',
-                'nouveau_statut' => 'livree',
-                'commentaire' => 'Colis récupéré au guichet agence.',
-                'utilisateur_id' => $admin1->id,
-            ]
-        );
+        // 10. Seed Boutiques & Partenaires default entries if tables exist
+        if (DB::getSchemaBuilder()->hasTable('boutiques')) {
+            DB::table('boutiques')->updateOrInsert(
+                ['id' => 1],
+                [
+                    'nom' => 'Boutique Principale Lomé',
+                    'adresse' => 'Boulevard du 13 Janvier, Lomé',
+                    'type' => 'propre',
+                    'description' => 'Boutique centrale Agroshop',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
+
+        if (DB::getSchemaBuilder()->hasTable('partenaires')) {
+            DB::table('partenaires')->updateOrInsert(
+                ['id' => 1],
+                [
+                    'nom' => 'YARA International',
+                    'description' => 'Partenaire d\'intrants et engrais',
+                    'logo' => null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

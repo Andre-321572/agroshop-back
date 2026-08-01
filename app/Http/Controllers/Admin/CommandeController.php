@@ -11,6 +11,7 @@ use Dompdf\Options;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class CommandeController extends Controller
 {
@@ -105,34 +106,25 @@ class CommandeController extends Controller
         $ancienStatut = $commande->statut_commande;
         $nouveauStatut = $request->statut_commande;
 
-        // Validation des transitions de statut autorisées
-        $transitionsAutorisees = [
-            'en_attente' => ['confirmee', 'annulee'],
-            'confirmee' => ['preparee', 'annulee'],
-            'preparee' => ['expediee', 'annulee'],
-            'expediee' => ['livree'],
-            'livree' => [],
-            'annulee' => [],
-        ];
-
-        if (!in_array($nouveauStatut, $transitionsAutorisees[$ancienStatut] ?? [])) {
-            return response()->json([
-                'status' => 'error',
-                'message' => "Transition de statut non autorisée : {$ancienStatut} → {$nouveauStatut}.",
-            ], 422);
-        }
-
         DB::transaction(function () use ($commande, $nouveauStatut, $ancienStatut, $request) {
-            $commande->update(['statut_commande' => $nouveauStatut]);
+            $updateData = ['statut_commande' => $nouveauStatut];
+            if ($nouveauStatut === 'livree') {
+                $updateData['statut_paiement'] = 'paye';
+            }
+            $commande->update($updateData);
 
-            // Création automatique du suivi
-            CommandeSuivi::create([
-                'commande_id' => $commande->id,
-                'statut_precedent' => $ancienStatut,
-                'nouveau_statut' => $nouveauStatut,
-                'commentaire' => $request->input('commentaire', 'Changement de statut par l\'administrateur'),
-                'utilisateur_id' => $request->user()->id,
-            ]);
+            // Création automatique du suivi (non-bloquant)
+            try {
+                if (Schema::hasTable('commande_suivis')) {
+                    CommandeSuivi::create([
+                        'commande_id' => $commande->id,
+                        'statut_precedent' => $ancienStatut,
+                        'nouveau_statut' => $nouveauStatut,
+                        'commentaire' => $request->input('commentaire', 'Changement de statut par l\'administrateur'),
+                        'utilisateur_id' => $request->user()?->id,
+                    ]);
+                }
+            } catch (\Throwable $e) {}
         });
 
         return response()->json([

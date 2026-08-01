@@ -125,6 +125,7 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::get('/commandes/{id}', [AdminCommandeController::class, 'show']);
     Route::get('/commandes/{id}/receipt', [AdminCommandeController::class, 'receipt']);
     Route::put('/commandes/{id}/statut', [AdminCommandeController::class, 'updateStatut']);
+    Route::post('/commandes/{id}/statut', [AdminCommandeController::class, 'updateStatut']);
     Route::put('/commandes/{id}/paiement', [AdminCommandeController::class, 'updatePaiement']);
     Route::put('/commandes/{id}/notes', [AdminCommandeController::class, 'updateNotes']);
 
@@ -198,6 +199,8 @@ Route::prefix('gestionnaire')->middleware('auth:sanctum')->group(function () {
     Route::get('/ventes', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'index']);
     Route::post('/ventes', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'store']);
     Route::get('/commandes/{id}/recu-pdf', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'genererRecuPdf']);
+    Route::post('/commandes/{id}/statut', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'updateStatut']);
+    Route::put('/commandes/{id}/statut', [\App\Http\Controllers\Api\Gestionnaire\VenteController::class, 'updateStatut']);
 
     Route::post('/rapports/generer', [\App\Http\Controllers\Api\Gestionnaire\RapportController::class, 'genererEtEnvoyer']);
 
