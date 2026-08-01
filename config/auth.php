@@ -45,7 +45,7 @@ return [
         ],
         'sanctum' => [
             'driver' => 'sanctum',
-            'provider' => 'administrateurs',
+            'provider' => null,
         ],
         'gestionnaire' => [
             'driver' => 'sanctum',
