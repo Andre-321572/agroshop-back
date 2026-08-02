@@ -127,6 +127,7 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('categories', AdminCategorieController::class);
 
     // Commandes
+    Route::get('/commandes/notifications', [AdminCommandeController::class, 'notifications']);
     Route::get('/commandes', [AdminCommandeController::class, 'index']);
     Route::get('/commandes/{id}', [AdminCommandeController::class, 'show']);
     Route::get('/commandes/{id}/receipt', [AdminCommandeController::class, 'receipt']);

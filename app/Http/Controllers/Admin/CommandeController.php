@@ -194,4 +194,37 @@ class CommandeController extends Controller
             'Content-Disposition' => 'inline; filename="receipt_' . $commande->code_reference . '.pdf"',
         ]);
     }
+
+    /**
+     * GET /api/admin/commandes/notifications
+     * Récupère les 10 dernières commandes récentes pour le système de notifications du header admin.
+     */
+    public function notifications(): JsonResponse
+    {
+        $commandes = Commande::orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get([
+                'id',
+                'code_reference',
+                'nom_client',
+                'prenom_client',
+                'montant_total',
+                'mode_paiement',
+                'statut_paiement',
+                'statut_commande',
+                'created_at'
+            ]);
+
+        $unreadCount = Commande::where('created_at', '>=', now()->subHours(24))
+            ->whereIn('statut_commande', ['en_attente', 'confirmee'])
+            ->count();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'notifications' => $commandes,
+                'unread_count' => $unreadCount,
+            ]
+        ]);
+    }
 }
