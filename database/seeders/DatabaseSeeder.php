@@ -911,6 +911,86 @@ class DatabaseSeeder extends Seeder
             );
         }
 
+        // 11. Seed Tags & Articles Blog
+        if (DB::getSchemaBuilder()->hasTable('tags')) {
+            $tags = [
+                ['id' => 1, 'nom' => 'Fertilisation', 'slug' => 'fertilisation', 'couleur' => '#10B981', 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 2, 'nom' => 'Phytosanitaire', 'slug' => 'phytosanitaire', 'couleur' => '#EF4444', 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 3, 'nom' => 'Irrigation', 'slug' => 'irrigation', 'couleur' => '#3B82F6', 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 4, 'nom' => 'Guide Pratique', 'slug' => 'guide-pratique', 'couleur' => '#F59E0B', 'created_at' => now(), 'updated_at' => now()],
+            ];
+            foreach ($tags as $t) {
+                DB::table('tags')->updateOrInsert(['id' => $t['id']], $t);
+            }
+        }
+
+        if (DB::getSchemaBuilder()->hasTable('articles_blog')) {
+            $articlesBlog = [
+                [
+                    'id' => 1,
+                    'titre' => 'Comment optimiser le rendement du Maïs avec l\'Urée 46% au Togo',
+                    'slug' => 'guide-optimiser-rendement-mais-uree-46',
+                    'chapeau' => 'Guide agronomique complet pour doser et appliquer l\'Urée 46% sur vos parcelles de maïs.',
+                    'extrait' => 'Guide agronomique complet pour doser et appliquer l\'Urée 46% sur vos parcelles de maïs au Togo. Calendrier d\'épandage et conseils pratiques.',
+                    'contenu' => "Le maïs est une culture très exigeante en azote. L'Urée 46% est l'engrais azoté le plus concentré pour assurer un développement végétatif vigoureux et maximiser le remplissage des épis.\n\n### 1. Le premier apport (Au semis ou au démariage)\nAppliquez le NPK 15-15-15 au moment du semis (environ 150 kg/ha). Cela permet un bon enracinement initial.\n\n### 2. Le deuxième apport (30-35 jours après semis)\nAppliquez 50 kg/ha d'Urée 46% au moment du deuxième sarclage. Enfouissez légèrement l'engrais au pied des plants pour éviter les pertes par volatilisation gazeuse.\n\n### 3. Le troisième apport (Avant la floraison)\nAppliquez les 50 kg/ha d'Urée 46% restants juste avant l'apparition des panicules mâles (environ 45 à 50 jours après semis).\n\n### Conseil d'expert AgroShop\nÉvitez d'épandre l'urée sur sol sec ou en plein soleil battant sans l'enfouir, car jusqu'à 30% de l'azote peut s'évaporer sous forme d'ammoniac dans l'air.",
+                    'image_principale' => '/images/hero-produits-agroshop.png',
+                    'statut' => 'publie',
+                    'date_publication' => '2025-10-01 10:00:00',
+                    'vues' => 1420,
+                    'auteur_id' => 1,
+                    'meta_title' => 'Optimiser le rendement du Maïs avec Urée 46% - AgroShop Togo',
+                    'meta_description' => 'Découvrez les étapes clés pour épandre l\'Urée 46% sur le maïs et doubler votre rendement récolte au Togo.',
+                    'created_at' => '2025-10-01 10:00:00',
+                    'updated_at' => '2025-10-01 10:00:00',
+                ],
+                [
+                    'id' => 2,
+                    'titre' => 'Prévention et traitement contre les chenilles légionnaires au Togo',
+                    'slug' => 'prevention-chenilles-legionnaires-protocole',
+                    'chapeau' => 'Protocole complet pour identifier et éradiquer la chenille légionnaire d\'automne.',
+                    'extrait' => 'Protocole d\'intervention rapide contre la chenille légionnaire d\'automne (Spodoptera frugiperda) pour protéger vos cultures céréalières.',
+                    'contenu' => "La chenille légionnaire d'automne (Spodoptera frugiperda) est l'un des ravageurs les plus destructeurs pour les cultures de maïs et de sorgho en Afrique de l'Ouest.\n\n### Identification précoce\nInspectez régulièrement le cœur du cornet des jeunes plants de maïs. Vous observerez de la sciure fraîche ou des trous caractéristiques sur les feuilles.\n\n### Traitement recommandé\nUtilisez un insecticide homologué à base d'Emamectine benzoate (ex: EMACOT 050 WG) dès l'apparition des premiers dégâts. Pulvérisez directement au cœur du cornet tôt le matin ou en fin d'après-midi.",
+                    'image_principale' => '/images/hero-produits-agroshop.png',
+                    'statut' => 'publie',
+                    'date_publication' => '2025-10-04 14:30:00',
+                    'vues' => 890,
+                    'auteur_id' => 1,
+                    'meta_title' => 'Traitement chenilles légionnaires maïs Togo - AgroShop',
+                    'meta_description' => 'Guide de traitement contre Spodoptera frugiperda au Togo avec les bio-insecticides adaptés.',
+                    'created_at' => '2025-10-04 14:30:00',
+                    'updated_at' => '2025-10-04 14:30:00',
+                ],
+                [
+                    'id' => 3,
+                    'titre' => 'Irrigation Goutte-à-Goutte : Économisez 50% d\'eau tout en augmentant vos récoltes',
+                    'slug' => 'irrigation-goutte-a-goutte-togo-economie-eau',
+                    'chapeau' => 'Avantages et installation d\'un système d\'irrigation localisée au Togo.',
+                    'extrait' => 'Pourquoi et comment installer un kit d\'irrigation goutte-à-goutte sur vos cultures maraîchères (tomate, piment, oignon) au Togo.',
+                    'contenu' => "Face aux irrégularités des saisons des pluies, l'irrigation goutte-à-goutte s'impose comme la solution idéale pour le maraîchage au Togo.\n\n### Avantages majeurs\n- **Économie d'eau** : Apport directement aux racines sans gaspillage par évaporation.\n- **Moins de mauvaises herbes** : Les inter-rangs restent secs.\n- **Fertirrigation** : Possibilité d'injecter des engrais solubles directement dans l'eau d'irrigation.",
+                    'image_principale' => '/images/hero-produits-agroshop.png',
+                    'statut' => 'publie',
+                    'date_publication' => '2025-10-05 09:15:00',
+                    'vues' => 610,
+                    'auteur_id' => 1,
+                    'meta_title' => 'Irrigation Goutte-à-Goutte Maraîchage Togo - AgroShop',
+                    'meta_description' => 'Guide d\'installation d\'un système goutte à goutte économique au Togo.',
+                    'created_at' => '2025-10-05 09:15:00',
+                    'updated_at' => '2025-10-05 09:15:00',
+                ]
+            ];
+
+            foreach ($articlesBlog as $art) {
+                DB::table('articles_blog')->updateOrInsert(['id' => $art['id']], $art);
+            }
+
+            if (DB::getSchemaBuilder()->hasTable('article_tags')) {
+                DB::table('article_tags')->updateOrInsert(['article_id' => 1, 'tag_id' => 1]);
+                DB::table('article_tags')->updateOrInsert(['article_id' => 1, 'tag_id' => 4]);
+                DB::table('article_tags')->updateOrInsert(['article_id' => 2, 'tag_id' => 2]);
+                DB::table('article_tags')->updateOrInsert(['article_id' => 3, 'tag_id' => 3]);
+            }
+        }
+
         if ($driver === 'mysql') {
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         } elseif ($driver === 'sqlite') {
