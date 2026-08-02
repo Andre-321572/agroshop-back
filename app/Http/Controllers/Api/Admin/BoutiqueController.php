@@ -271,9 +271,12 @@ class BoutiqueController extends Controller
     /**
      * Obtenir le rapport détaillé des stocks et ventes pour une boutique
      */
+    /**
+     * Obtenir le rapport détaillé des stocks et ventes pour une boutique (avec ventes journalières)
+     */
     public function getRapportBoutique($id)
     {
-        $boutique = Boutique::findOrFail($id);
+        $boutique = Boutique::with(['gestionnaires:id,nom,prenom,email,telephone,role'])->findOrFail($id);
         $hasBoutiqueIdOnCommandes = Schema::hasColumn('commandes', 'boutique_id');
 
         // 1. Produits affectés avec stock disponible et total vendu
@@ -300,7 +303,7 @@ class BoutiqueController extends Controller
                     $quantiteVendue = (int) ($ventesStats->quantite_vendue ?? 0);
                     $chiffreAffaires = (float) ($ventesStats->total_ca ?? 0);
                 } catch (\Throwable $e) {
-                    // Ignorer silencieusement en cas de divergence de schéma SQL
+                    // Ignorer silencieusement
                 }
             }
 
@@ -324,18 +327,22 @@ class BoutiqueController extends Controller
             ];
         })->filter()->values();
 
-        // 2. Commandes / Ventes récentes de la boutique
+        // 2. Commandes / Ventes historiques et journalières de la boutique
         $commandes = collect();
         $totalCA = 0;
         $totalCommandes = 0;
         $totalArticlesVendus = 0;
+
+        $caAujourdhui = 0;
+        $commandesAujourdhui = 0;
+        $articlesAujourdhui = 0;
 
         if ($hasBoutiqueIdOnCommandes) {
             try {
                 $commandes = DB::table('commandes')
                     ->where('boutique_id', $id)
                     ->orderByDesc('created_at')
-                    ->take(50)
+                    ->take(200)
                     ->get()
                     ->map(function ($cmd) {
                         $articles = DB::table('commande_articles as ca')
@@ -345,23 +352,45 @@ class BoutiqueController extends Controller
                             ->get();
 
                         return [
-                            'id'             => $cmd->id,
-                            'code_reference' => $cmd->code_reference,
-                            'nom_client'     => $cmd->nom_client . ($cmd->prenom_client ? ' ' . $cmd->prenom_client : ''),
-                            'telephone'      => $cmd->telephone ?? $cmd->telephone_client ?? '—',
-                            'statut'         => $cmd->statut_commande,
-                            'montant_total'  => (float) $cmd->montant_total,
-                            'created_at'     => $cmd->created_at,
-                            'articles'       => $articles,
+                            'id'              => $cmd->id,
+                            'code_reference'  => $cmd->code_reference,
+                            'nom_client'      => trim(($cmd->nom_client ?? '') . ' ' . ($cmd->prenom_client ?? '')),
+                            'telephone'       => $cmd->telephone ?? $cmd->telephone_client ?? '—',
+                            'statut'          => $cmd->statut_commande,
+                            'statut_paiement' => $cmd->statut_paiement ?? 'en_attente',
+                            'mode_paiement'   => $cmd->mode_paiement ?? 'especes',
+                            'montant_total'   => (float) $cmd->montant_total,
+                            'created_at'      => $cmd->created_at,
+                            'articles'        => $articles,
                         ];
                     });
 
+                // Totaux globaux
                 $totalCA = (float) DB::table('commandes')->where('boutique_id', $id)->sum('montant_total');
                 $totalCommandes = (int) DB::table('commandes')->where('boutique_id', $id)->count();
                 $totalArticlesVendus = (int) DB::table('commande_articles as ca')
                     ->join('commandes as c', 'ca.commande_id', '=', 'c.id')
                     ->where('c.boutique_id', $id)
                     ->sum('ca.quantite');
+
+                // Ventes d'Aujourd'hui
+                $today = now()->toDateString();
+                $caAujourdhui = (float) DB::table('commandes')
+                    ->where('boutique_id', $id)
+                    ->whereDate('created_at', $today)
+                    ->sum('montant_total');
+
+                $commandesAujourdhui = (int) DB::table('commandes')
+                    ->where('boutique_id', $id)
+                    ->whereDate('created_at', $today)
+                    ->count();
+
+                $articlesAujourdhui = (int) DB::table('commande_articles as ca')
+                    ->join('commandes as c', 'ca.commande_id', '=', 'c.id')
+                    ->where('c.boutique_id', $id)
+                    ->whereDate('c.created_at', $today)
+                    ->sum('ca.quantite');
+
             } catch (\Throwable $e) {
                 // Ignorer
             }
@@ -373,15 +402,20 @@ class BoutiqueController extends Controller
             'status' => 'success',
             'data'   => [
                 'boutique' => [
-                    'id'       => $boutique->id,
-                    'nom'      => $boutique->nom,
-                    'adresse'  => $boutique->adresse,
+                    'id'            => $boutique->id,
+                    'nom'           => $boutique->nom,
+                    'adresse'       => $boutique->adresse,
+                    'type'          => $boutique->type,
+                    'gestionnaires' => $boutique->gestionnaires,
                 ],
                 'kpi' => [
-                    'chiffre_affaires_total' => $totalCA,
-                    'nombre_commandes'       => $totalCommandes,
-                    'total_articles_vendus'  => $totalArticlesVendus,
-                    'valeur_stock_restant'   => $valeurStockRestant,
+                    'chiffre_affaires_total'      => $totalCA,
+                    'nombre_commandes'            => $totalCommandes,
+                    'total_articles_vendus'       => $totalArticlesVendus,
+                    'valeur_stock_restant'        => $valeurStockRestant,
+                    'chiffre_affaires_aujourdhui' => $caAujourdhui,
+                    'nombre_commandes_aujourdhui' => $commandesAujourdhui,
+                    'total_articles_aujourdhui'   => $articlesAujourdhui,
                 ],
                 'produits'  => $produitsStockVentes,
                 'commandes' => $commandes,
