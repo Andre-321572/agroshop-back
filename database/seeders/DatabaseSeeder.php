@@ -26,7 +26,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        $driver = DB::connection()->getDriverName();
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        } elseif ($driver === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = OFF;');
+        }
 
         // 1. Seed Administrateurs
         $administrateurs = [
@@ -774,36 +779,36 @@ class DatabaseSeeder extends Seeder
 
         // 6. Seed Produit Images
         $produitImages = [
-            ['id' => 1, 'produit_id' => 1, 'nom_fichier' => 'img_68505f1783ce7.jpg', 'url_image' => 'uploads/produits/img_68e45768479f2.jpg', 'alt_text' => 'Image de Urée YARA', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-06 23:57:28'],
-            ['id' => 2, 'produit_id' => 2, 'nom_fichier' => 'img_68505f9e59f65.jpg', 'url_image' => 'uploads/produits/img_68e4582133a2b.jpg', 'alt_text' => 'Image de Betterave BORO F1', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:00:33'],
-            ['id' => 3, 'produit_id' => 3, 'nom_fichier' => 'img_68505bfc2230b.jpg', 'url_image' => 'uploads/produits/img_68e45abdef8ef.jpg', 'alt_text' => 'Image de Lance de pulvérisateur agricole', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:11:41'],
-            ['id' => 4, 'produit_id' => 4, 'nom_fichier' => 'Pulvérisateur à dos motorisé STIHL.jpg', 'url_image' => 'uploads/produits/img_68e45c3e28e6e.jpg', 'alt_text' => 'Image de Atomiseur STIHL SR 450', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:18:06'],
-            ['id' => 5, 'produit_id' => 5, 'nom_fichier' => 'img_68522bfcb87c6.jpg', 'url_image' => 'uploads/produits/img_68e45d13b462d.jpg', 'alt_text' => 'Image de Pulvérisateur à dos Agroshop 20L', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:21:39'],
-            ['id' => 6, 'produit_id' => 6, 'nom_fichier' => 'Semoir manuel.jpg', 'url_image' => 'uploads/produits/img_68e45d33cc65e.jpg', 'alt_text' => 'Image de Semoir manuel à roue', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:22:11'],
-            ['id' => 7, 'produit_id' => 7, 'nom_fichier' => 'img_68534ebe3ec80.jpg', 'url_image' => 'uploads/produits/img_68e45db9b7d8c.jpg', 'alt_text' => 'Image de Buses de pulvérisation rouges ajustables', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:24:25'],
-            ['id' => 8, 'produit_id' => 8, 'nom_fichier' => 'Souffleur à main EGO.jpg', 'url_image' => 'uploads/produits/img_68e45dffbe10c.jpg', 'alt_text' => 'Image de Souffleur à main EGO 56V – 670 CFM', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:25:35'],
-            ['id' => 10, 'produit_id' => 10, 'nom_fichier' => 'EMACOT 050 WG.jpg', 'url_image' => 'uploads/produits/img_68e45fd506880.jpg', 'alt_text' => 'Image de EMACOT 050 WG', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:33:25'],
-            ['id' => 12, 'produit_id' => 9, 'nom_fichier' => 'img_68534ebe3e9ab.jpg', 'url_image' => 'Uploads/produits/img_68e460c161cb2.jpg', 'alt_text' => 'Image de YARA Souffleur de feuilles Greenworks 80V', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:37:21'],
-            ['id' => 13, 'produit_id' => 11, 'nom_fichier' => 'IMG-20250529-WA0137.jpg', 'url_image' => 'uploads/produits/img_68e4611b93675.jpg', 'alt_text' => 'Image de LDC - Light Duty Cleaner', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:38:51'],
-            ['id' => 14, 'produit_id' => 12, 'nom_fichier' => 'img_68522d4496f51.jpg', 'url_image' => 'uploads/produits/img_68e461603d754.jpg', 'alt_text' => 'Image de Engrais YaraVita Croplift Bio', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:40:00'],
-            ['id' => 15, 'produit_id' => 13, 'nom_fichier' => 'Fertilizaa.jpg', 'url_image' => 'uploads/produits/img_68e4632b4496c.jpg', 'alt_text' => 'Image de FERTILIZAA BLOOM 5-30-20', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:47:39'],
-            ['id' => 16, 'produit_id' => 14, 'nom_fichier' => 'IVORY 80 WP.jpg', 'url_image' => 'uploads/produits/img_68e463afc8b0e.jpg', 'alt_text' => 'Image de IVORY 80 WP', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:49:51'],
-            ['id' => 17, 'produit_id' => 15, 'nom_fichier' => 'SUNPYRIFOS 48% EC.jpg', 'url_image' => 'Uploads/produits/img_68e4656baa76c.jpg', 'alt_text' => 'Image de WYNCA SUNPYRIFOS 48% EC', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:57:15'],
-            ['id' => 18, 'produit_id' => 16, 'nom_fichier' => 'Tomate.jpg', 'url_image' => 'uploads/produits/img_68e4f5413e207.jpg', 'alt_text' => 'Image de SEMENCES DE TOMATE', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:10:57'],
-            ['id' => 19, 'produit_id' => 17, 'nom_fichier' => 'IMG-20250529-WA0140.jpg', 'url_image' => 'uploads/produits/img_68e4f65da875f.jpg', 'alt_text' => 'Image de POMPE CENTRIFUGE HAPPY®', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:15:41'],
-            ['id' => 20, 'produit_id' => 17, 'nom_fichier' => 'IMG-20250529-WA0159.jpg', 'url_image' => 'uploads/produits/img_68e4f65da8a7f.jpg', 'alt_text' => 'Image de POMPE CENTRIFUGE HAPPY®', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-07 11:15:41'],
-            ['id' => 21, 'produit_id' => 17, 'nom_fichier' => 'IMG-20250529-WA0162.jpg', 'url_image' => 'uploads/produits/img_68e4f65da8bd7.jpg', 'alt_text' => 'Image de POMPE CENTRIFUGE HAPPY®', 'ordre_affichage' => 2, 'principale' => 0, 'created_at' => '2025-10-07 11:15:41'],
-            ['id' => 22, 'produit_id' => 18, 'nom_fichier' => 'IMG-20250529-WA0144.jpg', 'url_image' => 'uploads/produits/img_68e4f6fb58058.jpg', 'alt_text' => 'Image de YARA YARAVERA', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:18:19'],
-            ['id' => 23, 'produit_id' => 19, 'nom_fichier' => 'IMG-20250529-WA0164.jpg', 'url_image' => 'uploads/produits/img_68e4f791c791c.jpg', 'alt_text' => 'Image de PULVÉRISATEUR À DOS AGROSHOP', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:20:49'],
-            ['id' => 24, 'produit_id' => 19, 'nom_fichier' => 'Pulvérisateur Agroshop.jpg', 'url_image' => 'uploads/produits/img_68e4f791c7e69.jpg', 'alt_text' => 'Image de PULVÉRISATEUR À DOS AGROSHOP', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-07 11:20:49'],
-            ['id' => 25, 'produit_id' => 19, 'nom_fichier' => 'Pulvérisateur.jpg', 'url_image' => 'uploads/produits/img_68e4f791c7f84.jpg', 'alt_text' => 'Image de PULVÉRISATEUR À DOS AGROSHOP', 'ordre_affichage' => 2, 'principale' => 0, 'created_at' => '2025-10-07 11:20:49'],
-            ['id' => 26, 'produit_id' => 20, 'nom_fichier' => 'IMG-20250529-WA0131.jpg', 'url_image' => 'uploads/produits/img_68e4f89249f85.jpg', 'alt_text' => 'Image de TUYAUX PVC BLANC', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:25:06'],
-            ['id' => 27, 'produit_id' => 20, 'nom_fichier' => 'tuyaux pvc.jpg', 'url_image' => 'uploads/produits/img_68e4f8924a5d8.jpg', 'alt_text' => 'Image de TUYAUX PVC BLANC', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-07 11:25:06'],
-            ['id' => 28, 'produit_id' => 21, 'nom_fichier' => 'tuyaux.jpg', 'url_image' => 'uploads/produits/img_68e4fa786df2c.jpg', 'alt_text' => 'Image de TUYAUX PPR', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:33:12'],
-            ['id' => 29, 'produit_id' => 22, 'nom_fichier' => 'YaraLiva NITRABOR (Engrais).jpg', 'url_image' => 'Uploads/produits/img_68e4fb545de98.jpg', 'alt_text' => 'Image de YARA YARALIVA™ NITRABOR', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:36:52'],
-            ['id' => 30, 'produit_id' => 23, 'nom_fichier' => 'IMG_6044.JPG', 'url_image' => 'uploads/produits/img_68f88b051d675.jpg', 'alt_text' => 'Image de Panneau solaire monocristallin 300W', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-22 07:43:01'],
-            ['id' => 31, 'produit_id' => 23, 'nom_fichier' => 'IMG_6045.JPG', 'url_image' => 'uploads/produits/img_68f88b051dba3.jpg', 'alt_text' => 'Image de Panneau solaire monocristallin 300W', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-22 07:43:01'],
-            ['id' => 32, 'produit_id' => 23, 'nom_fichier' => 'IMG_6046.JPG', 'url_image' => 'uploads/produits/img_68f88b051dd0e.jpg', 'alt_text' => 'Image de Panneau solaire monocristallin 300W', 'ordre_affichage' => 2, 'principale' => 0, 'created_at' => '2025-10-22 07:43:01'],
+            ['id' => 1, 'produit_id' => 1, 'nom_fichier' => 'img_68505f1783ce7.jpg', 'url_image' => 'storage/produits/img_68e45768479f2.jpg', 'alt_text' => 'Image de Urée YARA', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-06 23:57:28'],
+            ['id' => 2, 'produit_id' => 2, 'nom_fichier' => 'img_68505f9e59f65.jpg', 'url_image' => 'storage/produits/img_68e4582133a2b.jpg', 'alt_text' => 'Image de Betterave BORO F1', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:00:33'],
+            ['id' => 3, 'produit_id' => 3, 'nom_fichier' => 'img_68505bfc2230b.jpg', 'url_image' => 'storage/produits/img_68e45abdef8ef.jpg', 'alt_text' => 'Image de Lance de pulvérisateur agricole', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:11:41'],
+            ['id' => 4, 'produit_id' => 4, 'nom_fichier' => 'Pulvérisateur à dos motorisé STIHL.jpg', 'url_image' => 'storage/produits/img_68e45c3e28e6e.jpg', 'alt_text' => 'Image de Atomiseur STIHL SR 450', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:18:06'],
+            ['id' => 5, 'produit_id' => 5, 'nom_fichier' => 'img_68522bfcb87c6.jpg', 'url_image' => 'storage/produits/img_68e45d13b462d.jpg', 'alt_text' => 'Image de Pulvérisateur à dos Agroshop 20L', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:21:39'],
+            ['id' => 6, 'produit_id' => 6, 'nom_fichier' => 'Semoir manuel.jpg', 'url_image' => 'storage/produits/img_68e45d33cc65e.jpg', 'alt_text' => 'Image de Semoir manuel à roue', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:22:11'],
+            ['id' => 7, 'produit_id' => 7, 'nom_fichier' => 'img_68534ebe3ec80.jpg', 'url_image' => 'storage/produits/img_68e45db9b7d8c.jpg', 'alt_text' => 'Image de Buses de pulvérisation rouges ajustables', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:24:25'],
+            ['id' => 8, 'produit_id' => 8, 'nom_fichier' => 'Souffleur à main EGO.jpg', 'url_image' => 'storage/produits/img_68e45dffbe10c.jpg', 'alt_text' => 'Image de Souffleur à main EGO 56V – 670 CFM', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:25:35'],
+            ['id' => 10, 'produit_id' => 10, 'nom_fichier' => 'EMACOT 050 WG.jpg', 'url_image' => 'storage/produits/img_68e45fd506880.jpg', 'alt_text' => 'Image de EMACOT 050 WG', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:33:25'],
+            ['id' => 12, 'produit_id' => 9, 'nom_fichier' => 'img_68534ebe3e9ab.jpg', 'url_image' => 'storage/produits/img_68e460c161cb2.jpg', 'alt_text' => 'Image de YARA Souffleur de feuilles Greenworks 80V', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:37:21'],
+            ['id' => 13, 'produit_id' => 11, 'nom_fichier' => 'IMG-20250529-WA0137.jpg', 'url_image' => 'storage/produits/img_68e4611b93675.jpg', 'alt_text' => 'Image de LDC - Light Duty Cleaner', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:38:51'],
+            ['id' => 14, 'produit_id' => 12, 'nom_fichier' => 'img_68522d4496f51.jpg', 'url_image' => 'storage/produits/img_68e461603d754.jpg', 'alt_text' => 'Image de Engrais YaraVita Croplift Bio', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:40:00'],
+            ['id' => 15, 'produit_id' => 13, 'nom_fichier' => 'Fertilizaa.jpg', 'url_image' => 'storage/produits/img_68e4632b4496c.jpg', 'alt_text' => 'Image de FERTILIZAA BLOOM 5-30-20', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:47:39'],
+            ['id' => 16, 'produit_id' => 14, 'nom_fichier' => 'IVORY 80 WP.jpg', 'url_image' => 'storage/produits/img_68e463afc8b0e.jpg', 'alt_text' => 'Image de IVORY 80 WP', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:49:51'],
+            ['id' => 17, 'produit_id' => 15, 'nom_fichier' => 'SUNPYRIFOS 48% EC.jpg', 'url_image' => 'storage/produits/img_68e4656baa76c.jpg', 'alt_text' => 'Image de WYNCA SUNPYRIFOS 48% EC', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 00:57:15'],
+            ['id' => 18, 'produit_id' => 16, 'nom_fichier' => 'Tomate.jpg', 'url_image' => 'storage/produits/img_68e4f5413e207.jpg', 'alt_text' => 'Image de SEMENCES DE TOMATE', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:10:57'],
+            ['id' => 19, 'produit_id' => 17, 'nom_fichier' => 'IMG-20250529-WA0140.jpg', 'url_image' => 'storage/produits/img_68e4f65da875f.jpg', 'alt_text' => 'Image de POMPE CENTRIFUGE HAPPY®', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:15:41'],
+            ['id' => 20, 'produit_id' => 17, 'nom_fichier' => 'IMG-20250529-WA0159.jpg', 'url_image' => 'storage/produits/img_68e4f65da8a7f.jpg', 'alt_text' => 'Image de POMPE CENTRIFUGE HAPPY®', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-07 11:15:41'],
+            ['id' => 21, 'produit_id' => 17, 'nom_fichier' => 'IMG-20250529-WA0162.jpg', 'url_image' => 'storage/produits/img_68e4f65da8bd7.jpg', 'alt_text' => 'Image de POMPE CENTRIFUGE HAPPY®', 'ordre_affichage' => 2, 'principale' => 0, 'created_at' => '2025-10-07 11:15:41'],
+            ['id' => 22, 'produit_id' => 18, 'nom_fichier' => 'IMG-20250529-WA0144.jpg', 'url_image' => 'storage/produits/img_68e4f6fb58058.jpg', 'alt_text' => 'Image de YARA YARAVERA', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:18:19'],
+            ['id' => 23, 'produit_id' => 19, 'nom_fichier' => 'IMG-20250529-WA0164.jpg', 'url_image' => 'storage/produits/img_68e4f791c791c.jpg', 'alt_text' => 'Image de PULVÉRISATEUR À DOS AGROSHOP', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:20:49'],
+            ['id' => 24, 'produit_id' => 19, 'nom_fichier' => 'Pulvérisateur Agroshop.jpg', 'url_image' => 'storage/produits/img_68e4f791c7e69.jpg', 'alt_text' => 'Image de PULVÉRISATEUR À DOS AGROSHOP', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-07 11:20:49'],
+            ['id' => 25, 'produit_id' => 19, 'nom_fichier' => 'Pulvérisateur.jpg', 'url_image' => 'storage/produits/img_68e4f791c7f84.jpg', 'alt_text' => 'Image de PULVÉRISATEUR À DOS AGROSHOP', 'ordre_affichage' => 2, 'principale' => 0, 'created_at' => '2025-10-07 11:20:49'],
+            ['id' => 26, 'produit_id' => 20, 'nom_fichier' => 'IMG-20250529-WA0131.jpg', 'url_image' => 'storage/produits/img_68e4f89249f85.jpg', 'alt_text' => 'Image de TUYAUX PVC BLANC', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:25:06'],
+            ['id' => 27, 'produit_id' => 20, 'nom_fichier' => 'tuyaux pvc.jpg', 'url_image' => 'storage/produits/img_68e4f8924a5d8.jpg', 'alt_text' => 'Image de TUYAUX PVC BLANC', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-07 11:25:06'],
+            ['id' => 28, 'produit_id' => 21, 'nom_fichier' => 'tuyaux.jpg', 'url_image' => 'storage/produits/img_68e4fa786df2c.jpg', 'alt_text' => 'Image de TUYAUX PPR', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:33:12'],
+            ['id' => 29, 'produit_id' => 22, 'nom_fichier' => 'YaraLiva NITRABOR (Engrais).jpg', 'url_image' => 'storage/produits/img_68e4fb545de98.jpg', 'alt_text' => 'Image de YARA YARALIVA™ NITRABOR', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-07 11:36:52'],
+            ['id' => 30, 'produit_id' => 23, 'nom_fichier' => 'IMG_6044.JPG', 'url_image' => 'storage/produits/img_68f88b051d675.jpg', 'alt_text' => 'Image de Panneau solaire monocristallin 300W', 'ordre_affichage' => 0, 'principale' => 1, 'created_at' => '2025-10-22 07:43:01'],
+            ['id' => 31, 'produit_id' => 23, 'nom_fichier' => 'IMG_6045.JPG', 'url_image' => 'storage/produits/img_68f88b051dba3.jpg', 'alt_text' => 'Image de Panneau solaire monocristallin 300W', 'ordre_affichage' => 1, 'principale' => 0, 'created_at' => '2025-10-22 07:43:01'],
+            ['id' => 32, 'produit_id' => 23, 'nom_fichier' => 'IMG_6046.JPG', 'url_image' => 'storage/produits/img_68f88b051dd0e.jpg', 'alt_text' => 'Image de Panneau solaire monocristallin 300W', 'ordre_affichage' => 2, 'principale' => 0, 'created_at' => '2025-10-22 07:43:01'],
         ];
 
         foreach ($produitImages as $pi) {
@@ -898,14 +903,18 @@ class DatabaseSeeder extends Seeder
                 ['id' => 1],
                 [
                     'nom' => 'YARA International',
-                    'description' => 'Partenaire d\'intrants et engrais',
-                    'logo' => null,
+                    'logo_url' => null,
+                    'actif' => true,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]
             );
         }
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        } elseif ($driver === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = ON;');
+        }
     }
 }
