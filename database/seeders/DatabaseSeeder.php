@@ -914,10 +914,10 @@ class DatabaseSeeder extends Seeder
         // 11. Seed Tags & Articles Blog
         if (DB::getSchemaBuilder()->hasTable('tags')) {
             $tags = [
-                ['id' => 1, 'nom' => 'Fertilisation', 'slug' => 'fertilisation', 'couleur' => '#10B981', 'created_at' => now(), 'updated_at' => now()],
-                ['id' => 2, 'nom' => 'Phytosanitaire', 'slug' => 'phytosanitaire', 'couleur' => '#EF4444', 'created_at' => now(), 'updated_at' => now()],
-                ['id' => 3, 'nom' => 'Irrigation', 'slug' => 'irrigation', 'couleur' => '#3B82F6', 'created_at' => now(), 'updated_at' => now()],
-                ['id' => 4, 'nom' => 'Guide Pratique', 'slug' => 'guide-pratique', 'couleur' => '#F59E0B', 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 1, 'nom' => 'Fertilisation', 'slug' => 'fertilisation', 'couleur' => '#10B981', 'created_at' => now()],
+                ['id' => 2, 'nom' => 'Phytosanitaire', 'slug' => 'phytosanitaire', 'couleur' => '#EF4444', 'created_at' => now()],
+                ['id' => 3, 'nom' => 'Irrigation', 'slug' => 'irrigation', 'couleur' => '#3B82F6', 'created_at' => now()],
+                ['id' => 4, 'nom' => 'Guide Pratique', 'slug' => 'guide-pratique', 'couleur' => '#F59E0B', 'created_at' => now()],
             ];
             foreach ($tags as $t) {
                 DB::table('tags')->updateOrInsert(['id' => $t['id']], $t);
