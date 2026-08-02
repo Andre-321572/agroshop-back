@@ -46,4 +46,18 @@ return [
         'model'   => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | LeekPay — Paiement Mobile Money (XOF / Togo)
+    |--------------------------------------------------------------------------
+    | Clés disponibles sur https://leekpay.me/dashboard → Clés API
+    */
+    'leekpay' => [
+        'secret_key'  => env('LEEKPAY_SECRET_KEY', ''),
+        'public_key'  => env('LEEKPAY_PUBLIC_KEY', ''),
+        'webhook_url' => env('LEEKPAY_WEBHOOK_URL', ''),
+        'return_url'  => env('LEEKPAY_RETURN_URL', ''),
+        'cancel_url'  => env('LEEKPAY_CANCEL_URL', ''),
+    ],
+
 ];

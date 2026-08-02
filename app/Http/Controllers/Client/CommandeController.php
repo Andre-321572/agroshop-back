@@ -8,14 +8,17 @@ use App\Models\CommandeArticle;
 use App\Models\CommandeSuivi;
 use App\Models\ParametreSysteme;
 use App\Models\Produit;
+use App\Services\LeekPayService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\NotificationService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 class CommandeController extends Controller
 {
+    public function __construct(private readonly LeekPayService $leekPay) {}
     /**
      * POST /api/commandes
      * Prise de commande par un client (panier + coordonnées client).
@@ -55,10 +58,13 @@ class CommandeController extends Controller
             'date_livraison_souhaitee' => 'nullable|date',
             'instructions_livraison' => 'nullable|string',
             'commentaire' => 'nullable|string|max:255',
+            'mode_paiement' => 'nullable|string|in:mobile_money,especes',
             'items' => 'required|array|min:1',
             'items.*.produit_id' => 'required|integer|exists:produits,id',
             'items.*.quantite' => 'required|integer|min:1',
         ]);
+
+        $modePaiement = $request->input('mode_paiement', 'especes');
 
         DB::beginTransaction();
 
@@ -129,6 +135,7 @@ class CommandeController extends Controller
                 'commentaire' => $request->commentaire,
                 'ip_client' => $request->ip(),
                 'user_agent' => $request->userAgent(),
+                'mode_paiement' => $modePaiement,
             ];
 
             if ($hasBoutiqueId) {
@@ -169,6 +176,66 @@ class CommandeController extends Controller
                 app(NotificationService::class)->notifyNewOrder($commande);
             } catch (\Exception $e) {
                 // Log non-bloquant pour la commande
+            }
+
+            // --- Paiement Mobile Money via LeekPay ---
+            if ($modePaiement === 'mobile_money') {
+                try {
+                    $frontendUrl = rtrim(config('app.frontend_url', 'https://agroshoptg.store'), '/');
+                    $returnUrl   = config('services.leekpay.return_url')
+                        ?: "{$frontendUrl}/commande/succes?ref={$commande->code_reference}";
+                    $cancelUrl   = config('services.leekpay.cancel_url')
+                        ?: "{$frontendUrl}/commande/succes?ref={$commande->code_reference}&cancelled=1";
+                    $webhookUrl  = config('services.leekpay.webhook_url')
+                        ?: config('app.url') . '/api/leekpay/webhook';
+
+                    $checkout = $this->leekPay->createCheckout($commande, $returnUrl, $cancelUrl, $webhookUrl);
+
+                    // Sauvegarder les informations LeekPay sur la commande
+                    $commande->update([
+                        'leekpay_checkout_id' => $checkout['checkout_id'],
+                        'leekpay_payment_url' => $checkout['payment_url'],
+                        'mode_paiement'       => 'mobile_money',
+                    ]);
+
+                    Log::info('[LeekPay] Checkout créé', [
+                        'ref'         => $commande->code_reference,
+                        'checkout_id' => $checkout['checkout_id'],
+                    ]);
+
+                    return response()->json([
+                        'status'      => 'success',
+                        'message'     => 'Commande créée. Redirection vers le paiement...',
+                        'data'        => [
+                            'code_reference'   => $commande->code_reference,
+                            'montant_total'    => $commande->montant_total,
+                            'statut_commande'  => $commande->statut_commande,
+                            'created_at'       => $commande->created_at,
+                            'payment_url'      => $checkout['payment_url'],
+                            'leekpay_checkout_id' => $checkout['checkout_id'],
+                        ],
+                    ], 201);
+
+                } catch (\Exception $leekPayError) {
+                    // Si LeekPay échoue, la commande est quand même sauvegardée
+                    // On informe le client et on garde la commande "en attente"
+                    Log::error('[LeekPay] Erreur création checkout', [
+                        'ref'   => $commande->code_reference,
+                        'error' => $leekPayError->getMessage(),
+                    ]);
+
+                    return response()->json([
+                        'status'  => 'warning',
+                        'message' => 'Commande enregistrée mais le service de paiement est temporairement indisponible. Notre équipe vous contactera.',
+                        'data'    => [
+                            'code_reference'  => $commande->code_reference,
+                            'montant_total'   => $commande->montant_total,
+                            'statut_commande' => $commande->statut_commande,
+                            'created_at'      => $commande->created_at,
+                            'payment_url'     => null,
+                        ],
+                    ], 201);
+                }
             }
 
             return response()->json([

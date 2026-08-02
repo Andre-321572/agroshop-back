@@ -76,6 +76,12 @@ Route::get('/parametres', [ParametreController::class, 'index']);
 // --- FAQ ---
 Route::get('/faq', [FaqController::class, 'index']);
 
+// --- Partenaires Publics ---
+Route::get('/partenaires', [ClientPartenaireController::class, 'index']);
+
+// --- LeekPay Webhook (public, sans authentification Sanctum) ---
+Route::post('/leekpay/webhook', [\App\Http\Controllers\Client\LeekPayWebhookController::class, 'handle']);
+
 // --- Boutiques Publiques (pour panier & checkout client) ---
 Route::get('/boutiques-publiques', function() {
     $boutiques = \App\Models\Boutique::select('id', 'nom', 'type', 'adresse', 'telephone', 'localisation')
