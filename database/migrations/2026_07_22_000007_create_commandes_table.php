@@ -40,7 +40,7 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             
             // Nouvelle colonne pour le multi-boutiques
-            $table->foreignId('boutique_id')->nullable()->constrained('boutiques')->onDelete('set null');
+            $table->foreignId('boutique_id')->nullable();
             
             $table->timestamps();
 

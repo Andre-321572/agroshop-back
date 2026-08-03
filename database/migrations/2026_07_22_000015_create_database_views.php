@@ -32,7 +32,7 @@ return new class extends Migration
                 LEFT JOIN article_tags at ON a.id = at.article_id
                 LEFT JOIN tags t ON at.tag_id = t.id
                 WHERE a.statut = 'publie' AND a.date_publication <= CURRENT_TIMESTAMP 
-                GROUP BY a.id 
+                GROUP BY a.id, a.titre, a.extrait, a.slug, a.image_principale, a.date_publication, a.vues, ad.prenom, ad.nom 
                 ORDER BY a.date_publication DESC;
             ");
 
@@ -54,7 +54,7 @@ return new class extends Migration
                     SUM(ca.quantite) AS quantite_totale 
                 FROM commandes c
                 LEFT JOIN commande_articles ca ON c.id = ca.commande_id
-                GROUP BY c.id;
+                GROUP BY c.id, c.code_reference, c.prenom_client, c.nom_client, c.telephone, c.email, c.montant_total, c.type_livraison, c.statut_commande, c.statut_paiement, c.created_at;
             ");
 
             DB::statement("DROP VIEW IF EXISTS `v_produits_catalogue`");
@@ -111,7 +111,7 @@ return new class extends Migration
                 FROM produits p
                 LEFT JOIN commande_articles ca ON p.id = ca.produit_id
                 LEFT JOIN commandes c ON ca.commande_id = c.id AND c.statut_commande <> 'annulee'
-                GROUP BY p.id;
+                GROUP BY p.id, p.nom_commercial;
             ");
         } else {
             // Sintaxe MySQL / MariaDB (production)
@@ -132,7 +132,7 @@ return new class extends Migration
                 LEFT JOIN article_tags at ON a.id = at.article_id
                 LEFT JOIN tags t ON at.tag_id = t.id
                 WHERE a.statut = 'publie' AND a.date_publication <= CURRENT_TIMESTAMP() 
-                GROUP BY a.id 
+                GROUP BY a.id, a.titre, a.extrait, a.slug, a.image_principale, a.date_publication, a.vues, ad.prenom, ad.nom 
                 ORDER BY a.date_publication DESC;
             ");
 
@@ -153,7 +153,7 @@ return new class extends Migration
                     SUM(ca.quantite) AS quantite_totale 
                 FROM commandes c
                 LEFT JOIN commande_articles ca ON c.id = ca.commande_id
-                GROUP BY c.id;
+                GROUP BY c.id, c.code_reference, c.prenom_client, c.nom_client, c.telephone, c.email, c.montant_total, c.type_livraison, c.statut_commande, c.statut_paiement, c.created_at;
             ");
 
             DB::statement("
@@ -207,7 +207,7 @@ return new class extends Migration
                 FROM produits p
                 LEFT JOIN commande_articles ca ON p.id = ca.produit_id
                 LEFT JOIN commandes c ON ca.commande_id = c.id AND c.statut_commande <> 'annulee'
-                GROUP BY p.id;
+                GROUP BY p.id, p.nom_commercial;
             ");
         }
     }

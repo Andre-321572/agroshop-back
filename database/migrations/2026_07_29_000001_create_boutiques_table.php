@@ -21,6 +21,10 @@ return new class extends Migration
             $table->enum('statut', ['actif', 'inactif'])->default('actif');
             $table->timestamps();
         });
+
+        Schema::table('commandes', function (Blueprint $table) {
+            $table->foreign('boutique_id')->references('id')->on('boutiques')->onDelete('set null');
+        });
     }
 
     /**
@@ -28,6 +32,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('commandes', function (Blueprint $table) {
+            $table->dropForeign(['boutique_id']);
+        });
         Schema::dropIfExists('boutiques');
     }
 };
