@@ -20,8 +20,7 @@ class ProduitController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Produit::with(['categories', 'imagePrincipale', 'images'])
-            ->where('statut', '!=', 'inactif');
+        $query = Produit::with(['categories', 'imagePrincipale', 'images']);
 
         // Recherche textuelle
         if ($search = $request->input('search')) {
