@@ -123,9 +123,9 @@ class DashboardController extends Controller
             $dernieresCommandes = Commande::orderBy('created_at', 'desc')
                 ->limit(5)
                 ->get([
-                    'id', 'reference_commande', 'code_reference',
+                    'id', 'code_reference',
                     'nom_client', 'prenom_client',
-                    'telephone', 'telephone_client',
+                    'telephone',
                     'montant_total', 'statut_commande', 'statut_paiement',
                     'created_at'
                 ]);

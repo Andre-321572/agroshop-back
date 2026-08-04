@@ -43,7 +43,7 @@ class CommandeController extends Controller
                 $q->where('commandes.code_reference', 'LIKE', $searchTerm)
                   ->orWhere('commandes.nom_client', 'LIKE', $searchTerm)
                   ->orWhere('commandes.prenom_client', 'LIKE', $searchTerm)
-                  ->orWhere('commandes.telephone_client', 'LIKE', $searchTerm);
+                  ->orWhere('commandes.telephone', 'LIKE', $searchTerm);
             });
         }
 
