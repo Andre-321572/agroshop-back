@@ -21,41 +21,38 @@ class CommandeController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Commande::with('articles')
-            ->select('commandes.*')
-            ->selectRaw('COUNT(ca.id) as nombre_articles')
-            ->selectRaw('COALESCE(SUM(ca.quantite), 0) as quantite_totale')
-            ->leftJoin('commande_articles as ca', 'commandes.id', '=', 'ca.commande_id')
-            ->groupBy('commandes.id');
+        $query = Commande::with(['articles.produit'])
+            ->withCount('articles as nombre_articles')
+            ->withSum('articles as quantite_totale', 'quantite');
 
         // Filtre par date (optionnel)
         if ($request->filled('date_debut')) {
-            $query->whereDate('commandes.created_at', '>=', $request->input('date_debut'));
+            $query->whereDate('created_at', '>=', $request->input('date_debut'));
         }
         if ($request->filled('date_fin')) {
-            $query->whereDate('commandes.created_at', '<=', $request->input('date_fin'));
+            $query->whereDate('created_at', '<=', $request->input('date_fin'));
         }
 
         // Filtre par référence ou client
         if ($ref = $request->input('search_reference') ?: $request->input('search')) {
             $searchTerm = "%{$ref}%";
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('commandes.code_reference', 'LIKE', $searchTerm)
-                  ->orWhere('commandes.nom_client', 'LIKE', $searchTerm)
-                  ->orWhere('commandes.prenom_client', 'LIKE', $searchTerm)
-                  ->orWhere('commandes.telephone', 'LIKE', $searchTerm);
+                $q->where('code_reference', 'LIKE', $searchTerm)
+                  ->orWhere('nom_client', 'LIKE', $searchTerm)
+                  ->orWhere('prenom_client', 'LIKE', $searchTerm)
+                  ->orWhere('telephone', 'LIKE', $searchTerm);
             });
         }
 
         // Filtre par statut
         if ($statut = $request->input('statut')) {
             if ($statut !== 'tous') {
-                $query->where('commandes.statut_commande', $statut);
+                $query->where('statut_commande', $statut);
             }
         }
 
         $perPage = $request->input('per_page', 100);
-        $commandes = $query->orderBy('commandes.created_at', 'desc')->paginate($perPage);
+        $commandes = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
         // Statistiques globales
         $totalVentes = Commande::whereIn('statut_commande', ['confirmee', 'livree', 'expediee', 'preparee'])->sum('montant_total');
