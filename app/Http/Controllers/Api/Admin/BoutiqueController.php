@@ -28,8 +28,8 @@ class BoutiqueController extends Controller
     {
         $boutique = Boutique::findOrFail($id);
 
-        $produits = Produit::with('categorie:id,nom')
-            ->select('id', 'nom_commercial', 'categorie_id', 'prix_unitaire', 'unite_mesure')
+        $produits = Produit::with(['categories', 'categorie'])
+            ->select('id', 'nom_commercial', 'prix_unitaire', 'unite_mesure')
             ->orderBy('nom_commercial')
             ->get();
 
@@ -40,10 +40,17 @@ class BoutiqueController extends Controller
 
         $data = $produits->map(function ($p) use ($existingPivot) {
             $pivot = $existingPivot->get($p->id);
+            $catName = 'Général';
+            if ($p->categorie) {
+                $catName = $p->categorie->nom;
+            } elseif ($p->categories && $p->categories->first()) {
+                $catName = $p->categories->first()->nom;
+            }
+
             return [
                 'id'             => $p->id,
                 'nom_commercial' => $p->nom_commercial,
-                'categorie_nom'  => $p->categorie ? $p->categorie->nom : 'Général',
+                'categorie_nom'  => $catName,
                 'prix_unitaire'  => (float) $p->prix_unitaire,
                 'unite_mesure'   => $p->unite_mesure,
                 'stock_actuel'   => $pivot ? (int) $pivot->stock_disponible : 0,
