@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('unite_mesure', 50)->default('unité');
             $table->integer('stock_disponible')->default(0);
             $table->integer('stock_alerte')->nullable()->default(10);
-            $table->decimal('poids', 8, 2)->nullable();
+            $table->decimal('poids', 8, 3)->nullable();
             $table->string('dimensions', 100)->nullable();
             $table->enum('statut', ['actif', 'inactif', 'rupture'])->default('actif');
             $table->boolean('featured')->default(false);

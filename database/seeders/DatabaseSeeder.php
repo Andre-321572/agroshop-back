@@ -899,16 +899,17 @@ class DatabaseSeeder extends Seeder
         }
 
         if (DB::getSchemaBuilder()->hasTable('partenaires')) {
-            DB::table('partenaires')->updateOrInsert(
-                ['id' => 1],
-                [
-                    'nom' => 'YARA International',
-                    'logo_url' => null,
-                    'actif' => true,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
+            $defaultPartenaires = [
+                ['id' => 1, 'nom' => 'YARA International', 'logo_url' => null, 'actif' => true, 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 2, 'nom' => 'Bayer CropScience', 'logo_url' => null, 'actif' => true, 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 3, 'nom' => 'Syngenta Togo', 'logo_url' => null, 'actif' => true, 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 4, 'nom' => 'CAGIA Togo', 'logo_url' => null, 'actif' => true, 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 5, 'nom' => 'ITRA Togo', 'logo_url' => null, 'actif' => true, 'created_at' => now(), 'updated_at' => now()],
+                ['id' => 6, 'nom' => 'FAO Agriculture', 'logo_url' => null, 'actif' => true, 'created_at' => now(), 'updated_at' => now()],
+            ];
+            foreach ($defaultPartenaires as $p) {
+                DB::table('partenaires')->updateOrInsert(['id' => $p['id']], $p);
+            }
         }
 
         // 11. Seed Tags & Articles Blog
